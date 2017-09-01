@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrNoTicketTitle = errors.New("ErrNoTicketTitle")
+	ErrNoTicketTitle             = errors.New("ErrNoTicketTitle")
+	ErrCannotAssignToEmptyUserID = errors.New("ErrCannotAssignToEmptyUserID")
 )
 
 type TicketInfo struct {
@@ -34,11 +35,16 @@ func (ticket *Ticket) handleTicketAssigned(event TicketAssigned) {
 	ticket.assignee = event.Assignee
 }
 
-func (ticket *Ticket) AssignTo(userID uuid.UUID) {
-	ticket.apply(TicketAssigned{
-		TicketID: ticket.ID,
-		Assignee: userID,
-	})
+func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
+	if userID == uuid.Nil {
+		err = ErrCannotAssignToEmptyUserID
+	} else {
+		ticket.apply(TicketAssigned{
+			TicketID: ticket.ID,
+			Assignee: userID,
+		})
+	}
+	return
 }
 
 func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {

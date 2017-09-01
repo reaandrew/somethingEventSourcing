@@ -53,3 +53,15 @@ func TestCreatigANewTicketWithAssignee(t *testing.T) {
 	var event = ticket.CommittedEvents[1].(domain.TicketAssigned)
 	assert.Equal(t, event.Assignee, expectedAssignee)
 }
+
+func TestAssigningAnEmptyUserIDReturnsAnError(t *testing.T) {
+	var ticketInfo = domain.TicketInfo{
+		Title:   "Something",
+		Content: "stuff",
+	}
+	var ticket, _ = domain.NewTicket(ticketInfo)
+	var err = ticket.AssignTo(uuid.UUID{})
+
+	assert.Equal(t, domain.ErrCannotAssignToEmptyUserID, err)
+
+}
