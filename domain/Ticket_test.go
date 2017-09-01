@@ -19,6 +19,7 @@ func TestCreatingANewTicket(t *testing.T) {
 
 	var event = ticket.CommittedEvents[0].(domain.TicketCreated)
 	assert.Equal(t, event.Data.Title, expectedTitle)
+	assert.Equal(t, event.Version, 1)
 }
 
 func TestCreatingANewTicketWithoutATitleReturnsAnError(t *testing.T) {
@@ -52,6 +53,7 @@ func TestCreatigANewTicketWithAssignee(t *testing.T) {
 	assert.IsType(t, domain.TicketAssigned{}, ticket.CommittedEvents[1])
 	var event = ticket.CommittedEvents[1].(domain.TicketAssigned)
 	assert.Equal(t, event.Assignee, expectedAssignee)
+	assert.Equal(t, event.Version, 2)
 }
 
 func TestAssigningAnEmptyUserIDReturnsAnError(t *testing.T) {
