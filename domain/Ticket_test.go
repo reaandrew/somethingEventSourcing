@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/reaandrew/eventsourcing-in-go/domain"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,4 +37,19 @@ func TestCreatingANewTicketWithBody(t *testing.T) {
 
 	var event = ticket.CommittedEvents[0].(domain.TicketCreated)
 	assert.Equal(t, event.Data.Content, expectedContent)
+}
+
+func TestCreatigANewTicketWithAssignee(t *testing.T) {
+	var expectedAssignee = uuid.NewV4()
+	var ticketInfo = domain.TicketInfo{
+		Title:    "Something",
+		Content:  "stuff",
+		Assignee: expectedAssignee,
+	}
+	var ticket, _ = domain.NewTicket(ticketInfo)
+
+	assert.Equal(t, len(ticket.CommittedEvents), 2)
+	assert.IsType(t, domain.TicketAssigned{}, ticket.CommittedEvents[1])
+	var event = ticket.CommittedEvents[1].(domain.TicketAssigned)
+	assert.Equal(t, event.Assignee, expectedAssignee)
 }
