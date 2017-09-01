@@ -26,7 +26,7 @@ func TestCreatingANewTicketWithoutATitleReturnsAnError(t *testing.T) {
 	assert.Equal(t, domain.ErrNoTicketTitle, err)
 }
 
-func TestCreatedANewTicketWithBody(t *testing.T) {
+func TestCreatingANewTicketWithBody(t *testing.T) {
 	var expectedContent = "stuff"
 
 	var ticket, _ = domain.NewTicket(domain.TicketInfo{
