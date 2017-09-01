@@ -40,3 +40,9 @@ func TestAddingATicketToABoard(t *testing.T) {
 	var event = board.CommittedEvents[1].(es.TicketAddedToBoard)
 	assert.Equal(t, columns[0], event.Column.Name)
 }
+
+func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.T) {
+	var board = es.NewBoard(createColumns())
+	var err = board.AddTicket(es.NewTicket(), "Does not exist")
+	assert.Equal(t, es.ErrUnknownColumn, err)
+}

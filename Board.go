@@ -6,6 +6,10 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+var (
+	ErrUnknownColumn = errors.New("Unknown Column")
+)
+
 type BoardColumn struct {
 	ID      uuid.UUID
 	Name    string
@@ -46,7 +50,7 @@ func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, er
 			return column, nil
 		}
 	}
-	err = errors.New("Unknown column")
+	err = ErrUnknownColumn
 	return
 }
 
