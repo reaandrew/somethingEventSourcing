@@ -3,7 +3,7 @@ package main_test
 import (
 	"testing"
 
-	es "github.com/reaandrew/eventsourcing"
+	es "github.com/reaandrew/eventsourcing-in-go"
 	"github.com/stretchr/testify/assert"
 )
 
