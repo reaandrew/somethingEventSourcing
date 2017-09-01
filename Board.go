@@ -17,6 +17,10 @@ func (board *Board) AddTicket(ticket *Ticket) (err error) {
 	return
 }
 
+func (board *Board) handleBoardCreated(event BoardCreated) {
+	board.ID = event.BoardID
+}
+
 func (board *Board) handleTicketAddedToBoard(event TicketAddedToBoard) {
 	board.Tickets = append(board.Tickets, event.TicketID)
 }
@@ -24,7 +28,6 @@ func (board *Board) handleTicketAddedToBoard(event TicketAddedToBoard) {
 func (board *Board) apply(event interface{}) {
 	switch e := event.(type) {
 	case BoardCreated:
-		board.ID = e.BoardID
 	case TicketAddedToBoard:
 		board.handleTicketAddedToBoard(e)
 	default:
