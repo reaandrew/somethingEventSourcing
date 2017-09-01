@@ -63,5 +63,4 @@ func TestAssigningAnEmptyUserIDReturnsAnError(t *testing.T) {
 	var err = ticket.AssignTo(uuid.UUID{})
 
 	assert.Equal(t, domain.ErrCannotAssignToEmptyUserID, err)
-
 }

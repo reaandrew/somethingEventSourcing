@@ -23,6 +23,9 @@ func TestCreatingABoard(t *testing.T) {
 	assert.Equal(t, len(board.CommittedEvents), 1)
 	assert.Equal(t, len(board.CommittedEvents[0].(domain.BoardCreated).Columns), 3)
 	assert.IsType(t, domain.BoardCreated{}, board.CommittedEvents[0])
+
+	var event = board.CommittedEvents[0].(domain.BoardCreated)
+	assert.Equal(t, event.Version, 1)
 }
 
 func TestAddingATicketToABoard(t *testing.T) {

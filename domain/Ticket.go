@@ -20,6 +20,7 @@ type TicketInfo struct {
 type Ticket struct {
 	CommittedEvents []interface{}
 	ID              uuid.UUID
+	version         int
 	title           string
 	content         string
 	assignee        uuid.UUID
@@ -29,10 +30,12 @@ func (ticket *Ticket) handleTicketCreated(event TicketCreated) {
 	ticket.ID = event.TicketID
 	ticket.title = event.Data.Title
 	ticket.content = event.Data.Content
+	ticket.version = event.Version
 }
 
 func (ticket *Ticket) handleTicketAssigned(event TicketAssigned) {
 	ticket.assignee = event.Assignee
+	ticket.version = event.Version
 }
 
 func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
@@ -42,6 +45,7 @@ func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 		ticket.apply(TicketAssigned{
 			TicketID: ticket.ID,
 			Assignee: userID,
+			Version:  ticket.version + 1,
 		})
 	}
 	return
@@ -55,6 +59,7 @@ func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 		newTicket.apply(TicketCreated{
 			TicketID: uuid.NewV4(),
 			Data:     info,
+			Version:  1,
 		})
 
 		if info.Assignee != uuid.Nil {
@@ -78,11 +83,13 @@ func (ticket *Ticket) apply(event interface{}) {
 }
 
 type TicketCreated struct {
+	Version  int
 	TicketID uuid.UUID
 	Data     TicketInfo
 }
 
 type TicketAssigned struct {
+	Version  int
 	TicketID uuid.UUID
 	Assignee uuid.UUID
 }

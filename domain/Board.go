@@ -29,6 +29,7 @@ type Board struct {
 	CommittedEvents []interface{}
 	ID              uuid.UUID
 	Columns         []BoardColumn
+	version         int
 }
 
 func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
@@ -37,6 +38,7 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 		err = findErr
 	}
 	var event = TicketAddedToBoard{
+		Version:  board.version + 1,
 		TicketID: ticket.ID,
 		Column:   column,
 	}
@@ -84,6 +86,7 @@ func NewBoard(columns []string) (newBoard *Board) {
 		boardColumns = append(boardColumns, NewBoardColumn(column))
 	}
 	newBoard.apply(BoardCreated{
+		Version: 1,
 		BoardID: uuid.NewV4(),
 		Columns: boardColumns,
 	})
@@ -91,11 +94,13 @@ func NewBoard(columns []string) (newBoard *Board) {
 }
 
 type TicketAddedToBoard struct {
+	Version  int
 	TicketID uuid.UUID
 	Column   BoardColumn
 }
 
 type BoardCreated struct {
+	Version int
 	BoardID uuid.UUID
 	Columns []BoardColumn
 }
