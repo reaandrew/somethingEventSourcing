@@ -28,7 +28,7 @@ func NewBoardColumn(name string) (newBoardColumn BoardColumn) {
 type Board struct {
 	CommittedEvents []interface{}
 	ID              uuid.UUID
-	Columns         []BoardColumn
+	columns         []BoardColumn
 	version         int
 }
 
@@ -47,7 +47,7 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 }
 
 func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, err error) {
-	for _, column := range board.Columns {
+	for _, column := range board.columns {
 		if columnName == column.Name {
 			return column, nil
 		}
@@ -58,11 +58,11 @@ func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, er
 
 func (board *Board) handleBoardCreated(event BoardCreated) {
 	board.ID = event.BoardID
-	board.Columns = event.Columns
+	board.columns = event.Columns
 }
 
 func (board *Board) handleTicketAddedToBoard(event TicketAddedToBoard) {
-	board.Columns[0].Tickets = append(board.Columns[0].Tickets, event.TicketID)
+	board.columns[0].Tickets = append(board.columns[0].Tickets, event.TicketID)
 }
 
 func (board *Board) apply(event interface{}) {
