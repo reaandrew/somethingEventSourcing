@@ -48,6 +48,7 @@ func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 			Assignee:  userID,
 			Version:   ticket.version + 1,
 			Timestamp: time.Now(),
+			EventID:   uuid.NewV4(),
 		})
 	}
 	return
@@ -95,6 +96,7 @@ type TicketCreated struct {
 }
 
 type TicketAssigned struct {
+	EventID   uuid.UUID
 	Timestamp time.Time
 	Version   int
 	TicketID  uuid.UUID

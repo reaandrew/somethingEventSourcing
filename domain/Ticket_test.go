@@ -20,7 +20,7 @@ func TestCreatingANewTicket(t *testing.T) {
 	var event = ticket.CommittedEvents[0].(domain.TicketCreated)
 	assert.Equal(t, event.Data.Title, expectedTitle)
 	assert.Equal(t, event.Version, 1)
-
+	assert.NotEmpty(t, uuid.Nil, event.EventID)
 	assert.False(t, event.Timestamp.IsZero())
 }
 
@@ -57,6 +57,7 @@ func TestCreatigANewTicketWithAssignee(t *testing.T) {
 	assert.False(t, event.Timestamp.IsZero())
 	assert.Equal(t, event.Assignee, expectedAssignee)
 	assert.Equal(t, event.Version, 2)
+	assert.NotEmpty(t, uuid.Nil, event.EventID)
 }
 
 func TestAssigningAnEmptyUserIDReturnsAnError(t *testing.T) {
