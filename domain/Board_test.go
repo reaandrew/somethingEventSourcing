@@ -29,7 +29,7 @@ func TestAddingATicketToABoard(t *testing.T) {
 	var columns = createColumns()
 	var board = domain.NewBoard(columns)
 
-	var err = board.AddTicket(domain.NewTicket(), "To Do")
+	var err = board.AddTicket(domain.NewTicket("something"), "To Do")
 
 	assert.Nil(t, err)
 
@@ -43,6 +43,6 @@ func TestAddingATicketToABoard(t *testing.T) {
 
 func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.T) {
 	var board = domain.NewBoard(createColumns())
-	var err = board.AddTicket(domain.NewTicket(), "Does not exist")
+	var err = board.AddTicket(domain.NewTicket("something"), "Does not exist")
 	assert.Equal(t, domain.ErrUnknownColumn, err)
 }
