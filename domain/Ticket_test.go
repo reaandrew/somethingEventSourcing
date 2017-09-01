@@ -9,7 +9,7 @@ import (
 
 func TestCreatingANewTicket(t *testing.T) {
 	var expectedTitle = "something"
-	var ticket = domain.NewTicket(domain.TicketInfo{
+	var ticket, _ = domain.NewTicket(domain.TicketInfo{
 		Title: expectedTitle,
 	})
 
@@ -20,10 +20,16 @@ func TestCreatingANewTicket(t *testing.T) {
 	assert.Equal(t, event.Data.Title, expectedTitle)
 }
 
+func TestCreatingANewTicketWithoutATitleReturnsAnError(t *testing.T) {
+	var _, err = domain.NewTicket(domain.TicketInfo{})
+
+	assert.Equal(t, domain.ErrNoTicketTitle, err)
+}
+
 func TestCreatedANewTicketWithBody(t *testing.T) {
 	var expectedContent = "stuff"
 
-	var ticket = domain.NewTicket(domain.TicketInfo{
+	var ticket, _ = domain.NewTicket(domain.TicketInfo{
 		Title:   "Something",
 		Content: expectedContent,
 	})

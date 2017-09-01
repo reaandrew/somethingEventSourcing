@@ -1,6 +1,14 @@
 package domain
 
-import uuid "github.com/satori/go.uuid"
+import (
+	"errors"
+
+	uuid "github.com/satori/go.uuid"
+)
+
+var (
+	ErrNoTicketTitle = errors.New("ErrNoTicketTitle")
+)
 
 type TicketInfo struct {
 	Title   string
@@ -29,12 +37,16 @@ func (ticket *Ticket) apply(event interface{}) {
 	ticket.CommittedEvents = append(ticket.CommittedEvents, event)
 }
 
-func NewTicket(info TicketInfo) (newTicket *Ticket) {
+func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 	newTicket = &Ticket{}
-	newTicket.apply(TicketCreated{
-		TicketID: uuid.NewV4(),
-		Data:     info,
-	})
+	if info.Title == "" {
+		err = ErrNoTicketTitle
+	} else {
+		newTicket.apply(TicketCreated{
+			TicketID: uuid.NewV4(),
+			Data:     info,
+		})
+	}
 	return
 }
 
