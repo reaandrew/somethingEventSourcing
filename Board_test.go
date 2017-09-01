@@ -29,9 +29,14 @@ func TestAddingATicketToABoard(t *testing.T) {
 	var columns = createColumns()
 	var board = es.NewBoard(columns)
 
-	board.AddTicket(es.NewTicket())
+	var err = board.AddTicket(es.NewTicket(), "To Do")
+
+	assert.Nil(t, err)
 
 	assert.Equal(t, len(board.CommittedEvents), 2)
 	assert.IsType(t, es.BoardCreated{}, board.CommittedEvents[0])
 	assert.IsType(t, es.TicketAddedToBoard{}, board.CommittedEvents[1])
+
+	var event = board.CommittedEvents[1].(es.TicketAddedToBoard)
+	assert.Equal(t, columns[0], event.Column.Name)
 }

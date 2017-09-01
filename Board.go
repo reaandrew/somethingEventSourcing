@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/satori/go.uuid"
 )
 
@@ -25,10 +27,26 @@ type Board struct {
 	Columns         []BoardColumn
 }
 
-func (board *Board) AddTicket(ticket *Ticket) (err error) {
-	board.apply(TicketAddedToBoard{
+func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
+	var column, findErr = board.findColumn(columnName)
+	if findErr != nil {
+		err = findErr
+	}
+	var event = TicketAddedToBoard{
 		TicketID: ticket.ID,
-	})
+		Column:   column,
+	}
+	board.apply(event)
+	return
+}
+
+func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, err error) {
+	for _, column := range board.Columns {
+		if columnName == column.Name {
+			return column, nil
+		}
+	}
+	err = errors.New("Unknown column")
 	return
 }
 
@@ -70,6 +88,7 @@ func NewBoard(columns []string) (newBoard *Board) {
 
 type TicketAddedToBoard struct {
 	TicketID uuid.UUID
+	Column   BoardColumn
 }
 
 type BoardCreated struct {
