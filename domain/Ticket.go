@@ -44,9 +44,10 @@ func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 		err = ErrCannotAssignToEmptyUserID
 	} else {
 		ticket.apply(TicketAssigned{
-			TicketID: ticket.ID,
-			Assignee: userID,
-			Version:  ticket.version + 1,
+			TicketID:  ticket.ID,
+			Assignee:  userID,
+			Version:   ticket.version + 1,
+			Timestamp: time.Now(),
 		})
 	}
 	return
@@ -94,7 +95,8 @@ type TicketCreated struct {
 }
 
 type TicketAssigned struct {
-	Version  int
-	TicketID uuid.UUID
-	Assignee uuid.UUID
+	Timestamp time.Time
+	Version   int
+	TicketID  uuid.UUID
+	Assignee  uuid.UUID
 }

@@ -54,6 +54,7 @@ func TestCreatigANewTicketWithAssignee(t *testing.T) {
 	assert.Equal(t, len(ticket.CommittedEvents), 2)
 	assert.IsType(t, domain.TicketAssigned{}, ticket.CommittedEvents[1])
 	var event = ticket.CommittedEvents[1].(domain.TicketAssigned)
+	assert.False(t, event.Timestamp.IsZero())
 	assert.Equal(t, event.Assignee, expectedAssignee)
 	assert.Equal(t, event.Version, 2)
 }
