@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/reaandrew/eventsourcing-in-go/domain"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,6 +27,8 @@ func TestCreatingABoard(t *testing.T) {
 
 	var event = board.CommittedEvents[0].(domain.BoardCreated)
 	assert.Equal(t, event.Version, 1)
+	assert.NotEmpty(t, uuid.Nil, event.EventID)
+	assert.False(t, event.Timestamp.IsZero())
 }
 
 func TestAddingATicketToABoard(t *testing.T) {
@@ -46,6 +49,8 @@ func TestAddingATicketToABoard(t *testing.T) {
 
 	var event = board.CommittedEvents[1].(domain.TicketAddedToBoard)
 	assert.Equal(t, columns[0], event.Column.Name)
+	assert.NotEmpty(t, uuid.Nil, event.EventID)
+	assert.False(t, event.Timestamp.IsZero())
 }
 
 func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.T) {

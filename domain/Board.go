@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"time"
 
 	"github.com/satori/go.uuid"
 )
@@ -38,9 +39,11 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 		err = findErr
 	}
 	var event = TicketAddedToBoard{
-		Version:  board.version + 1,
-		TicketID: ticket.ID,
-		Column:   column,
+		Version:   board.version + 1,
+		TicketID:  ticket.ID,
+		Column:    column,
+		EventID:   uuid.NewV4(),
+		Timestamp: time.Now(),
 	}
 	board.apply(event)
 	return
@@ -86,21 +89,27 @@ func NewBoard(columns []string) (newBoard *Board) {
 		boardColumns = append(boardColumns, NewBoardColumn(column))
 	}
 	newBoard.apply(BoardCreated{
-		Version: 1,
-		BoardID: uuid.NewV4(),
-		Columns: boardColumns,
+		Version:   1,
+		BoardID:   uuid.NewV4(),
+		Columns:   boardColumns,
+		EventID:   uuid.NewV4(),
+		Timestamp: time.Now(),
 	})
 	return
 }
 
 type TicketAddedToBoard struct {
-	Version  int
-	TicketID uuid.UUID
-	Column   BoardColumn
+	EventID   uuid.UUID
+	Timestamp time.Time
+	Version   int
+	TicketID  uuid.UUID
+	Column    BoardColumn
 }
 
 type BoardCreated struct {
-	Version int
-	BoardID uuid.UUID
-	Columns []BoardColumn
+	EventID   uuid.UUID
+	Timestamp time.Time
+	Version   int
+	BoardID   uuid.UUID
+	Columns   []BoardColumn
 }
