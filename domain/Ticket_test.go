@@ -20,6 +20,8 @@ func TestCreatingANewTicket(t *testing.T) {
 	var event = ticket.CommittedEvents[0].(domain.TicketCreated)
 	assert.Equal(t, event.Data.Title, expectedTitle)
 	assert.Equal(t, event.Version, 1)
+
+	assert.False(t, event.Timestamp.IsZero())
 }
 
 func TestCreatingANewTicketWithoutATitleReturnsAnError(t *testing.T) {

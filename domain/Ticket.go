@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -57,9 +58,11 @@ func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 		err = ErrNoTicketTitle
 	} else {
 		newTicket.apply(TicketCreated{
-			TicketID: uuid.NewV4(),
-			Data:     info,
-			Version:  1,
+			TicketID:  uuid.NewV4(),
+			Data:      info,
+			Version:   1,
+			EventID:   uuid.NewV4(),
+			Timestamp: time.Now(),
 		})
 
 		if info.Assignee != uuid.Nil {
@@ -83,9 +86,11 @@ func (ticket *Ticket) apply(event interface{}) {
 }
 
 type TicketCreated struct {
-	Version  int
-	TicketID uuid.UUID
-	Data     TicketInfo
+	EventID   uuid.UUID
+	Timestamp time.Time
+	Version   int
+	TicketID  uuid.UUID
+	Data      TicketInfo
 }
 
 type TicketAssigned struct {
