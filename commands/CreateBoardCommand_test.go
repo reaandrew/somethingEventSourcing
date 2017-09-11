@@ -5,17 +5,12 @@ import (
 
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
-	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
+	"github.com/reaandrew/eventsourcing-in-go/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateBoardCommandPublishesBoardCreated(t *testing.T) {
-	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher()
-	var domainRepository = services.NewDomainRepository(eventStore, eventPublisher)
-	var commandExecutor = commands.NewCommandExecutor(domainRepository)
-
+	var sut = test.NewSystemUnderTest()
 	var command = commands.CreateBoardCommand{
 		Name: "some board",
 		Columns: []string{
@@ -25,9 +20,9 @@ func TestCreateBoardCommandPublishesBoardCreated(t *testing.T) {
 		},
 	}
 
-	var err = commandExecutor.Execute(command)
+	var err = sut.CommandExecutor.Execute(command)
 
 	assert.Nil(t, err)
-	assert.Equal(t, 1, eventPublisher.NumberOfEventsPublished())
-	assert.IsType(t, domain.BoardCreated{}, eventPublisher.GetEvent(0))
+	assert.Equal(t, 1, sut.NumberOfEventsPublished())
+	assert.IsType(t, domain.BoardCreated{}, sut.GetEvent(0))
 }

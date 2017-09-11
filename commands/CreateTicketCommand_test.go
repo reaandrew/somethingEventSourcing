@@ -7,15 +7,13 @@ import (
 	"github.com/reaandrew/eventsourcing-in-go/domain"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
+	"github.com/reaandrew/eventsourcing-in-go/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateTicketCommandPublishesTicketCreated(t *testing.T) {
-	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher()
-	var domainRepository = services.NewDomainRepository(eventStore, eventPublisher)
-	var commandExecutor = commands.NewCommandExecutor(domainRepository)
+	var sut = test.NewSystemUnderTest()
 
 	var command = commands.CreateBoardCommand{
 		Name: "some board",
@@ -26,18 +24,18 @@ func TestCreateTicketCommandPublishesTicketCreated(t *testing.T) {
 		},
 	}
 
-	var err = commandExecutor.Execute(command)
+	var err = sut.CommandExecutor.Execute(command)
 	assert.Nil(t, err)
 
 	var boardCreatedEvent domain.BoardCreated
-	boardCreatedEvent = eventPublisher.GetEvent(0).(domain.BoardCreated)
+	boardCreatedEvent = sut.GetEvent(0).(domain.BoardCreated)
 
 	var createTicketCommand = commands.CreateTicketCommand{
 		BoardID: boardCreatedEvent.BoardID.String(),
 		Title:   "some ticket",
 	}
 
-	var createErr = commandExecutor.Execute(createTicketCommand)
+	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
 	assert.Nil(t, createErr)
 
 }

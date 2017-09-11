@@ -9,16 +9,6 @@ func (publisher *InMemoryEventPublisher) Publish(events []interface{}) (err erro
 	return
 }
 
-func (publisher *InMemoryEventPublisher) NumberOfEventsPublished() (value int) {
-	value = len(publisher.events)
-	return
-}
-
-func (publisher *InMemoryEventPublisher) GetEvent(index int) (value interface{}) {
-	value = publisher.events[index]
-	return
-}
-
 func NewInMemoryEventPublisher() (newPublisher *InMemoryEventPublisher) {
 	newPublisher = &InMemoryEventPublisher{
 		events: []interface{}{},
