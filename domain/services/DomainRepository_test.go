@@ -6,21 +6,20 @@ import (
 	"github.com/reaandrew/eventsourcing-in-go/domain"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
+	"github.com/reaandrew/eventsourcing-in-go/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDomainRepositoryGetAggregateReplaysEvents(t *testing.T) {
-	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher()
-	var domainRepository = services.NewDomainRepository(eventStore, eventPublisher)
+	var sut = test.NewSystemUnderTest()
 
 	var board = domain.NewBoard(domain.BoardInfo{
 		Columns: []string{"A", "B", "C"},
 	})
-	domainRepository.Save(board)
+	sut.DomainRepository.Save(board)
 
-	savedBoard, err := domainRepository.GetBoard(board.GetID())
+	savedBoard, err := sut.DomainRepository.GetBoard(board.GetID())
 
 	assert.Nil(t, err)
 
