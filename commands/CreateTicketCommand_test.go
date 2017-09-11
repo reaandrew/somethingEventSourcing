@@ -5,8 +5,6 @@ import (
 
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
-	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
 	"github.com/reaandrew/eventsourcing-in-go/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -41,15 +39,12 @@ func TestCreateTicketCommandPublishesTicketCreated(t *testing.T) {
 }
 
 func TestCreateTicketCommandReturnsErrorWhenBoardDoesNotExist(t *testing.T) {
-	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher()
-	var domainRepository = services.NewDomainRepository(eventStore, eventPublisher)
-	var commandExecutor = commands.NewCommandExecutor(domainRepository)
+	var sut = test.NewSystemUnderTest()
 	var createTicketCommand = commands.CreateTicketCommand{
 		BoardID: uuid.NewV4().String(),
 	}
 
-	var createErr = commandExecutor.Execute(createTicketCommand)
+	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
 	assert.Equal(t, domain.ErrBoardNotExist, createErr)
 }
 
