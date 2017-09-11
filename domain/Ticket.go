@@ -10,6 +10,7 @@ import (
 var (
 	ErrNoTicketTitle             = errors.New("ErrNoTicketTitle")
 	ErrCannotAssignToEmptyUserID = errors.New("ErrCannotAssignToEmptyUserID")
+	ErrInvalidAssigneeID         = errors.New("ErrInvalidAssigneeID")
 )
 
 type TicketInfo struct {

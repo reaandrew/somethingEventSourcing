@@ -26,7 +26,7 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 	var ticketInfo = domain.TicketInfo{}
 	var assigneeID, assigneeErr = uuid.FromString(command.Assignee)
 	if command.Assignee != "" && assigneeErr != nil {
-		returnErr = assigneeErr
+		returnErr = domain.ErrInvalidAssigneeID
 		return
 	}
 	if command.Assignee != "" {

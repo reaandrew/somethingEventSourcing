@@ -49,7 +49,28 @@ func TestCreateTicketCommandReturnsErrorWhenBoardDoesNotExist(t *testing.T) {
 }
 
 func TestCreateTicketCommandReturnsErrorWhenAssigneeNotUUID(t *testing.T) {
+	var sut = test.NewSystemUnderTest()
+	var command = commands.CreateBoardCommand{
+		Name: "some board",
+		Columns: []string{
+			"todo",
+			"doing",
+			"done",
+		},
+	}
 
+	var err = sut.CommandExecutor.Execute(command)
+	assert.Nil(t, err)
+
+	var boardCreatedEvent domain.BoardCreated
+	boardCreatedEvent = sut.GetEvent(0).(domain.BoardCreated)
+
+	var createTicketCommand = commands.CreateTicketCommand{
+		BoardID:  boardCreatedEvent.BoardID.String(),
+		Assignee: "something",
+	}
+	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
+	assert.Equal(t, domain.ErrInvalidAssigneeID, createErr)
 }
 
 func TestCreateTicketCommandReturnsErrorWhenTitleIsEmpty(t *testing.T) {
