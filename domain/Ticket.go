@@ -54,6 +54,19 @@ func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 	return
 }
 
+func (ticket *Ticket) GetCommittedEvents() (events []interface{}) {
+	return ticket.CommittedEvents
+}
+
+func (ticket *Ticket) GetID() (returnID uuid.UUID) {
+	return ticket.ID
+}
+
+func (ticket *Ticket) GetVersion() (version int) {
+	version = ticket.version
+	return
+}
+
 func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 	newTicket = &Ticket{}
 	if info.Title == "" {

@@ -2,6 +2,7 @@ package domain_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/reaandrew/eventsourcing-in-go/domain"
 	uuid "github.com/satori/go.uuid"
@@ -19,7 +20,9 @@ func createColumns() (columns []string) {
 
 func TestCreatingABoard(t *testing.T) {
 	var columns = createColumns()
-	var board = domain.NewBoard(columns)
+	var board = domain.NewBoard(domain.BoardInfo{
+		Columns: columns,
+	})
 
 	assert.Equal(t, len(board.CommittedEvents), 1)
 	assert.Equal(t, len(board.CommittedEvents[0].(domain.BoardCreated).Columns), 3)
@@ -33,7 +36,9 @@ func TestCreatingABoard(t *testing.T) {
 
 func TestAddingATicketToABoard(t *testing.T) {
 	var columns = createColumns()
-	var board = domain.NewBoard(columns)
+	var board = domain.NewBoard(domain.BoardInfo{
+		Columns: columns,
+	})
 
 	var ticket, _ = domain.NewTicket(domain.TicketInfo{
 		Title: "something",
@@ -54,10 +59,28 @@ func TestAddingATicketToABoard(t *testing.T) {
 }
 
 func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.T) {
-	var board = domain.NewBoard(createColumns())
+	var board = domain.NewBoard(domain.BoardInfo{
+		Columns: createColumns(),
+	})
 	var ticket, _ = domain.NewTicket(domain.TicketInfo{
 		Title: "something",
 	})
 	var err = board.AddTicket(ticket, "Does not exist")
 	assert.Equal(t, domain.ErrUnknownColumn, err)
+}
+
+func TestLoadingABoardFromEvents(t *testing.T) {
+	var events = []interface{}{
+		domain.BoardCreated{
+			EventID:   uuid.NewV4(),
+			Timestamp: time.Now(),
+			Version:   1,
+			BoardID:   uuid.NewV4(),
+			Columns:   []domain.BoardColumn{},
+		},
+	}
+
+	var board = domain.Board{}
+	board.Load(events)
+
 }
