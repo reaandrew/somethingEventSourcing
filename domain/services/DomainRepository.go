@@ -7,13 +7,23 @@ import (
 )
 
 type DomainRepository struct {
-	eventStore     core.EventStore
-	eventPublisher core.EventPublisher
+	eventStore        core.EventStore
+	eventPublisher    core.EventPublisher
+	trackedAggregates map[uuid.UUID]core.Aggregate
 }
 
 func (repository DomainRepository) Save(aggregate core.Aggregate) {
+	if _, ok := repository.trackedAggregates[aggregate.GetID()]; !ok {
+		repository.trackedAggregates[aggregate.GetID()] = aggregate
+	}
 	repository.eventStore.Save(aggregate)
 	repository.eventPublisher.Publish(aggregate.GetCommittedEvents())
+}
+
+func (repository DomainRepository) Commit() {
+	for _, aggregate := range repository.trackedAggregates {
+		aggregate.Commit()
+	}
 }
 
 func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard *models.Board, returnErr error) {
@@ -33,7 +43,8 @@ func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard *models.Boar
 
 func NewDomainRepository(eventStore core.EventStore, eventPublisher core.EventPublisher) (domainRepository DomainRepository) {
 	return DomainRepository{
-		eventStore:     eventStore,
-		eventPublisher: eventPublisher,
+		eventStore:        eventStore,
+		eventPublisher:    eventPublisher,
+		trackedAggregates: map[uuid.UUID]core.Aggregate{},
 	}
 }

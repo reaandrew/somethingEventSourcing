@@ -9,11 +9,13 @@ import (
 )
 
 var (
-	ErrUnknownColumn = errors.New("ErrUnknownColumn")
-	ErrBoardNotExist = errors.New("ErrBoardNoExist")
+	ErrUnknownColumn  = errors.New("ErrUnknownColumn")
+	ErrBoardNotExist  = errors.New("ErrBoardNotExist")
+	ErrInvalidBoardID = errors.New("ErrInvalidBoardID")
 )
 
 type BoardInfo struct {
+	BoardID uuid.UUID
 	Name    string
 	Columns []string
 }
@@ -64,6 +66,10 @@ func (board *Board) GetID() (returnID uuid.UUID) {
 func (board *Board) GetVersion() (version int) {
 	version = board.version
 	return
+}
+
+func (board *Board) Commit() {
+	board.CommittedEvents = []core.DomainEvent{}
 }
 
 func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, err error) {
@@ -125,7 +131,7 @@ func NewBoard(info BoardInfo) (newBoard *Board) {
 		boardColumns = append(boardColumns, NewBoardColumn(column))
 	}
 	newBoard.publish(BoardCreated{
-		BoardID: uuid.NewV4(),
+		BoardID: info.BoardID,
 		Columns: boardColumns,
 	})
 	return

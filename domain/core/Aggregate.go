@@ -6,4 +6,5 @@ type Aggregate interface {
 	GetCommittedEvents() []DomainEvent
 	GetID() uuid.UUID
 	GetVersion() int
+	Commit()
 }

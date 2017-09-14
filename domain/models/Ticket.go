@@ -64,6 +64,10 @@ func (ticket *Ticket) GetVersion() (version int) {
 	return
 }
 
+func (ticket *Ticket) Commit() {
+	ticket.CommittedEvents = []core.DomainEvent{}
+}
+
 func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 	newTicket = &Ticket{}
 	if info.Title == "" {

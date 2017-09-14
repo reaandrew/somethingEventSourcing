@@ -3,10 +3,12 @@ package test
 import (
 	"fmt"
 
+	"github.com/icrowley/fake"
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
+	uuid "github.com/satori/go.uuid"
 )
 
 type EventRecorder struct {
@@ -37,6 +39,46 @@ func (sut SystemUnderTest) NumberOfEventsPublished() (value int) {
 func (sut SystemUnderTest) GetEvent(index int) (value interface{}) {
 	var domainEvent = sut.eventRecorder.Events[index]
 	value = domainEvent.Data
+	return
+}
+
+func (sut SystemUnderTest) CreateSampleBoard(name string) (boardID uuid.UUID) {
+	boardID = uuid.NewV4()
+	var command = commands.CreateBoardCommand{
+		BoardID: boardID.String(),
+		Name:    name,
+		Columns: []string{
+			"todo",
+			"doing",
+			"done",
+		},
+	}
+
+	var err = sut.CommandExecutor.Execute(command)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return
+}
+
+func (sut SystemUnderTest) CreateSampleTicket(boardID uuid.UUID, column string) (ticketID uuid.UUID) {
+	ticketID = uuid.NewV4()
+	var command = commands.CreateTicketCommand{
+		TicketID: ticketID.String(),
+		BoardID:  boardID.String(),
+		Column:   column,
+		Title:    fake.Title(),
+		Content:  fake.Paragraph(),
+	}
+
+	var err = sut.CommandExecutor.Execute(command)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return
 }
 

@@ -8,6 +8,7 @@ var (
 )
 
 type CreateTicketCommand struct {
+	TicketID string
 	BoardID  string
 	Column   string
 	Title    string
