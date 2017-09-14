@@ -13,11 +13,11 @@ type CreateTicketCommandHandler struct {
 func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (returnErr error) {
 	var boardID, idErr = uuid.FromString(command.BoardID)
 	if idErr != nil {
-		returnErr = idErr
+		returnErr = ErrInvalidBoardID
 		return
 	}
 
-	var _, err = handler.DomainRepository.GetBoard(boardID)
+	var board, err = handler.DomainRepository.GetBoard(boardID)
 	if err != nil {
 		returnErr = err
 		return
@@ -26,7 +26,7 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 	var ticketInfo = domain.TicketInfo{}
 	var assigneeID, assigneeErr = uuid.FromString(command.Assignee)
 	if command.Assignee != "" && assigneeErr != nil {
-		returnErr = domain.ErrInvalidAssigneeID
+		returnErr = ErrInvalidAssigneeID
 		return
 	}
 	if command.Assignee != "" {
@@ -42,6 +42,10 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 		return
 	}
 
+	board.AddTicket(ticket, command.Column)
+
 	handler.DomainRepository.Save(ticket)
+	handler.DomainRepository.Save(board)
+
 	return
 }

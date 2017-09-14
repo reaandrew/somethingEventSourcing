@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateTicketCommandPublishesTicketCreated(t *testing.T) {
+func TestCreateTicketCommandPublishesEvents(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 
 	var command = commands.CreateBoardCommand{
@@ -30,12 +30,15 @@ func TestCreateTicketCommandPublishesTicketCreated(t *testing.T) {
 
 	var createTicketCommand = commands.CreateTicketCommand{
 		BoardID: boardCreatedEvent.BoardID.String(),
+		Column:  "todo",
 		Title:   "some ticket",
 	}
 
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
 	assert.Nil(t, createErr)
 
+	assert.IsType(t, domain.TicketCreated{}, sut.GetEvent(1))
+	assert.IsType(t, domain.TicketAddedToBoard{}, sut.GetEvent(2))
 }
 
 func TestCreateTicketCommandReturnsErrorWhenBoardDoesNotExist(t *testing.T) {
@@ -46,6 +49,16 @@ func TestCreateTicketCommandReturnsErrorWhenBoardDoesNotExist(t *testing.T) {
 
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
 	assert.Equal(t, domain.ErrBoardNotExist, createErr)
+}
+
+func TestCreateTicketCommandReturnsErrorWhenBoardIDNotUUID(t *testing.T) {
+	var sut = test.NewSystemUnderTest()
+	var createTicketCommand = commands.CreateTicketCommand{
+		BoardID: "something",
+	}
+
+	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
+	assert.Equal(t, commands.ErrInvalidBoardID, createErr)
 }
 
 func TestCreateTicketCommandReturnsErrorWhenAssigneeNotUUID(t *testing.T) {
@@ -70,9 +83,30 @@ func TestCreateTicketCommandReturnsErrorWhenAssigneeNotUUID(t *testing.T) {
 		Assignee: "something",
 	}
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
-	assert.Equal(t, domain.ErrInvalidAssigneeID, createErr)
+	assert.Equal(t, commands.ErrInvalidAssigneeID, createErr)
 }
 
 func TestCreateTicketCommandReturnsErrorWhenTitleIsEmpty(t *testing.T) {
+	var sut = test.NewSystemUnderTest()
+	var command = commands.CreateBoardCommand{
+		Name: "some board",
+		Columns: []string{
+			"todo",
+			"doing",
+			"done",
+		},
+	}
 
+	var err = sut.CommandExecutor.Execute(command)
+	assert.Nil(t, err)
+
+	var boardCreatedEvent domain.BoardCreated
+	boardCreatedEvent = sut.GetEvent(0).(domain.BoardCreated)
+
+	var createTicketCommand = commands.CreateTicketCommand{
+		BoardID:  boardCreatedEvent.BoardID.String(),
+		Assignee: uuid.NewV4().String(),
+	}
+	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
+	assert.Equal(t, domain.ErrNoTicketTitle, createErr)
 }

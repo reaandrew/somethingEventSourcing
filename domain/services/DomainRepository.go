@@ -16,7 +16,8 @@ func (repository DomainRepository) Save(aggregate core.Aggregate) {
 	repository.eventPublisher.Publish(aggregate.GetCommittedEvents())
 }
 
-func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard domain.Board, returnErr error) {
+func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard *domain.Board, returnErr error) {
+	newBoard = &domain.Board{}
 	var events, err = repository.eventStore.GetEvents(id)
 	if err != nil {
 		returnErr = err
