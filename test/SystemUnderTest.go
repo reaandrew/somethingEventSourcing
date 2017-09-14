@@ -22,6 +22,10 @@ func (eventRecorder *EventRecorder) Publish(events []core.DomainEvent) (err erro
 	return
 }
 
+func (eventRecorder *EventRecorder) Clear() {
+	eventRecorder.Events = []core.DomainEvent{}
+}
+
 type SystemUnderTest struct {
 	EventStore       core.EventStore
 	EventPublisher   core.EventPublisher
@@ -31,18 +35,22 @@ type SystemUnderTest struct {
 }
 
 func (sut SystemUnderTest) NumberOfEventsPublished() (value int) {
-	fmt.Println(sut.eventRecorder.Events)
 	value = len(sut.eventRecorder.Events)
 	return
 }
 
 func (sut SystemUnderTest) GetEvent(index int) (value interface{}) {
+	fmt.Println("Events", sut.eventRecorder.Events)
+	if len(sut.eventRecorder.Events) == 0 {
+		return nil
+	}
 	var domainEvent = sut.eventRecorder.Events[index]
 	value = domainEvent.Data
 	return
 }
 
 func (sut SystemUnderTest) CreateSampleBoard(name string) (boardID uuid.UUID) {
+	defer sut.DomainRepository.Commit()
 	boardID = uuid.NewV4()
 	var command = commands.CreateBoardCommand{
 		BoardID: boardID.String(),
@@ -64,6 +72,7 @@ func (sut SystemUnderTest) CreateSampleBoard(name string) (boardID uuid.UUID) {
 }
 
 func (sut SystemUnderTest) CreateSampleTicket(boardID uuid.UUID, column string) (ticketID uuid.UUID) {
+	defer sut.DomainRepository.Commit()
 	ticketID = uuid.NewV4()
 	var command = commands.CreateTicketCommand{
 		TicketID: ticketID.String(),
@@ -80,6 +89,10 @@ func (sut SystemUnderTest) CreateSampleTicket(boardID uuid.UUID, column string) 
 	}
 
 	return
+}
+
+func (sut SystemUnderTest) ClearRecordedEvents() {
+	sut.eventRecorder.Clear()
 }
 
 func NewSystemUnderTest() (sut SystemUnderTest) {

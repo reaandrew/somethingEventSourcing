@@ -47,6 +47,6 @@ func TestCommitClearsCommittedEventsFromAllAggregatesSaved(t *testing.T) {
 
 	domainRepository.Commit()
 
-	assert.Equal(t, 0, len(sample1.GetCommittedEvents()))
-	assert.Equal(t, 0, len(sample2.GetCommittedEvents()))
+	assert.Equal(t, 0, len(sample1.GetUncommittedEvents()))
+	assert.Equal(t, 0, len(sample2.GetUncommittedEvents()))
 }

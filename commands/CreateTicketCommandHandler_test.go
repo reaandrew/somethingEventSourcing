@@ -13,25 +13,13 @@ import (
 func TestCreateTicketCommandPublishesEvents(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 
-	var command = commands.CreateBoardCommand{
-		Name: "some board",
-		Columns: []string{
-			"todo",
-			"doing",
-			"done",
-		},
-	}
-
-	var err = sut.CommandExecutor.Execute(command)
-	assert.Nil(t, err)
-
-	var boardCreatedEvent models.BoardCreated
-	boardCreatedEvent = sut.GetEvent(0).(models.BoardCreated)
+	var boardID = sut.CreateSampleBoard("something")
 
 	var createTicketCommand = commands.CreateTicketCommand{
-		BoardID: boardCreatedEvent.BoardID.String(),
-		Column:  "todo",
-		Title:   "some ticket",
+		TicketID: uuid.NewV4().String(),
+		BoardID:  boardID.String(),
+		Column:   "todo",
+		Title:    "some ticket",
 	}
 
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
@@ -63,23 +51,9 @@ func TestCreateTicketCommandReturnsErrorWhenBoardIDNotUUID(t *testing.T) {
 
 func TestCreateTicketCommandReturnsErrorWhenAssigneeNotUUID(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
-	var command = commands.CreateBoardCommand{
-		Name: "some board",
-		Columns: []string{
-			"todo",
-			"doing",
-			"done",
-		},
-	}
-
-	var err = sut.CommandExecutor.Execute(command)
-	assert.Nil(t, err)
-
-	var boardCreatedEvent models.BoardCreated
-	boardCreatedEvent = sut.GetEvent(0).(models.BoardCreated)
-
+	var boardID = sut.CreateSampleBoard("something")
 	var createTicketCommand = commands.CreateTicketCommand{
-		BoardID:  boardCreatedEvent.BoardID.String(),
+		BoardID:  boardID.String(),
 		Assignee: "something",
 	}
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)
@@ -88,23 +62,11 @@ func TestCreateTicketCommandReturnsErrorWhenAssigneeNotUUID(t *testing.T) {
 
 func TestCreateTicketCommandReturnsErrorWhenTitleIsEmpty(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
-	var command = commands.CreateBoardCommand{
-		Name: "some board",
-		Columns: []string{
-			"todo",
-			"doing",
-			"done",
-		},
-	}
-
-	var err = sut.CommandExecutor.Execute(command)
-	assert.Nil(t, err)
-
-	var boardCreatedEvent models.BoardCreated
-	boardCreatedEvent = sut.GetEvent(0).(models.BoardCreated)
+	var boardID = sut.CreateSampleBoard("something")
 
 	var createTicketCommand = commands.CreateTicketCommand{
-		BoardID:  boardCreatedEvent.BoardID.String(),
+		TicketID: uuid.NewV4().String(),
+		BoardID:  boardID.String(),
 		Assignee: uuid.NewV4().String(),
 	}
 	var createErr = sut.CommandExecutor.Execute(createTicketCommand)

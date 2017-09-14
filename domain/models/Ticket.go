@@ -12,21 +12,24 @@ var (
 	ErrNoTicketTitle             = errors.New("ErrNoTicketTitle")
 	ErrCannotAssignToEmptyUserID = errors.New("ErrCannotAssignToEmptyUserID")
 	ErrInvalidAssigneeID         = errors.New("ErrInvalidAssigneeID")
+	ErrInvalidTicketID           = errors.New("ErrInvalidTicketID")
+	ErrTicketNotExist            = errors.New("ErrTicketNotExist")
 )
 
 type TicketInfo struct {
+	TicketID uuid.UUID
 	Title    string
 	Content  string
 	Assignee uuid.UUID
 }
 
 type Ticket struct {
-	CommittedEvents []core.DomainEvent
-	ID              uuid.UUID
-	version         int
-	title           string
-	content         string
-	assignee        uuid.UUID
+	UncommittedEvents []core.DomainEvent
+	ID                uuid.UUID
+	version           int
+	title             string
+	content           string
+	assignee          uuid.UUID
 }
 
 func (ticket *Ticket) handleTicketCreated(event TicketCreated) {
@@ -51,8 +54,8 @@ func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 	return
 }
 
-func (ticket *Ticket) GetCommittedEvents() (events []core.DomainEvent) {
-	return ticket.CommittedEvents
+func (ticket *Ticket) GetUncommittedEvents() (events []core.DomainEvent) {
+	return ticket.UncommittedEvents
 }
 
 func (ticket *Ticket) GetID() (returnID uuid.UUID) {
@@ -65,7 +68,7 @@ func (ticket *Ticket) GetVersion() (version int) {
 }
 
 func (ticket *Ticket) Commit() {
-	ticket.CommittedEvents = []core.DomainEvent{}
+	ticket.UncommittedEvents = []core.DomainEvent{}
 }
 
 func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
@@ -74,7 +77,7 @@ func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 		err = ErrNoTicketTitle
 	} else {
 		newTicket.publish(TicketCreated{
-			TicketID: uuid.NewV4(),
+			TicketID: info.TicketID,
 			Info:     info,
 		})
 
@@ -111,12 +114,12 @@ func (ticket *Ticket) replay(domainEvent core.DomainEvent) {
 func (ticket *Ticket) publish(event interface{}) {
 	var domainEvent = core.DomainEvent{
 		ID:        uuid.NewV4(),
-		Version:   ticket.version + len(ticket.CommittedEvents) + 1,
+		Version:   ticket.version + len(ticket.UncommittedEvents) + 1,
 		Timestamp: time.Now(),
 		Data:      event,
 	}
 	ticket.apply(domainEvent)
-	ticket.CommittedEvents = append(ticket.CommittedEvents, domainEvent)
+	ticket.UncommittedEvents = append(ticket.UncommittedEvents, domainEvent)
 }
 
 type TicketCreated struct {

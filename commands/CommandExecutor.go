@@ -22,8 +22,13 @@ func (executor CommandExecutor) Execute(command interface{}) (err error) {
 		}
 
 		return handler.Execute(c)
+	case AssignTicketCommand:
+		var handler = AssignTicketCommandHandler{
+			DomainRepository: executor.DomainRepository,
+		}
+		return handler.Execute(c)
+	default:
 	}
-
 	return
 }
 

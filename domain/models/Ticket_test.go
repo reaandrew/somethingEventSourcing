@@ -14,9 +14,9 @@ func TestCreatingANewTicket(t *testing.T) {
 		Title: expectedTitle,
 	})
 
-	assert.Equal(t, len(ticket.CommittedEvents), 1)
+	assert.Equal(t, len(ticket.UncommittedEvents), 1)
 
-	var domainEvent = ticket.CommittedEvents[0]
+	var domainEvent = ticket.UncommittedEvents[0]
 	var eventData = domainEvent.Data.(models.TicketCreated)
 
 	assert.IsType(t, models.TicketCreated{}, eventData)
@@ -40,7 +40,7 @@ func TestCreatingANewTicketWithBody(t *testing.T) {
 		Content: expectedContent,
 	})
 
-	var domainEvent = ticket.CommittedEvents[0]
+	var domainEvent = ticket.UncommittedEvents[0]
 	var eventData = domainEvent.Data.(models.TicketCreated)
 
 	assert.Equal(t, eventData.Info.Content, expectedContent)
@@ -55,9 +55,9 @@ func TestCreatigANewTicketWithAssignee(t *testing.T) {
 	}
 	var ticket, _ = models.NewTicket(ticketInfo)
 
-	assert.Equal(t, len(ticket.CommittedEvents), 2)
+	assert.Equal(t, len(ticket.UncommittedEvents), 2)
 
-	var domainEvent = ticket.CommittedEvents[1]
+	var domainEvent = ticket.UncommittedEvents[1]
 	var eventData = domainEvent.Data.(models.TicketAssigned)
 
 	assert.IsType(t, models.TicketAssigned{}, eventData)

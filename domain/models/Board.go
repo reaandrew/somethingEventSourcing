@@ -36,10 +36,10 @@ func NewBoardColumn(name string) (newBoardColumn BoardColumn) {
 }
 
 type Board struct {
-	CommittedEvents []core.DomainEvent
-	ID              uuid.UUID
-	columns         []BoardColumn
-	version         int
+	UncommittedEvents []core.DomainEvent
+	ID                uuid.UUID
+	columns           []BoardColumn
+	version           int
 }
 
 func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
@@ -55,8 +55,8 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 	return
 }
 
-func (board *Board) GetCommittedEvents() (events []core.DomainEvent) {
-	return board.CommittedEvents
+func (board *Board) GetUncommittedEvents() (events []core.DomainEvent) {
+	return board.UncommittedEvents
 }
 
 func (board *Board) GetID() (returnID uuid.UUID) {
@@ -69,7 +69,7 @@ func (board *Board) GetVersion() (version int) {
 }
 
 func (board *Board) Commit() {
-	board.CommittedEvents = []core.DomainEvent{}
+	board.UncommittedEvents = []core.DomainEvent{}
 }
 
 func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, err error) {
@@ -116,12 +116,12 @@ func (board *Board) replay(domainEvent core.DomainEvent) {
 func (board *Board) publish(event interface{}) {
 	var domainEvent = core.DomainEvent{
 		ID:        uuid.NewV4(),
-		Version:   board.version + len(board.CommittedEvents) + 1,
+		Version:   board.version + len(board.UncommittedEvents) + 1,
 		Timestamp: time.Now(),
 		Data:      event,
 	}
 	board.apply(domainEvent)
-	board.CommittedEvents = append(board.CommittedEvents, domainEvent)
+	board.UncommittedEvents = append(board.UncommittedEvents, domainEvent)
 }
 
 func NewBoard(info BoardInfo) (newBoard *Board) {

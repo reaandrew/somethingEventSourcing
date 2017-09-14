@@ -6,13 +6,15 @@ import (
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/test"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateBoardCommandPublishesBoardCreated(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 	var command = commands.CreateBoardCommand{
-		Name: "some board",
+		BoardID: uuid.NewV4().String(),
+		Name:    "some board",
 		Columns: []string{
 			"todo",
 			"doing",

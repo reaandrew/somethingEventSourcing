@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/reaandrew/eventsourcing-in-go/commands"
@@ -16,6 +17,10 @@ func TestAssignTicketCommandPublishesTicketAssigned(t *testing.T) {
 	var boardID = sut.CreateSampleBoard("fubar")
 
 	var ticketID = sut.CreateSampleTicket(boardID, "todo")
+
+	fmt.Println("TicketID", ticketID)
+
+	sut.ClearRecordedEvents()
 
 	var assignee = uuid.NewV4().String()
 

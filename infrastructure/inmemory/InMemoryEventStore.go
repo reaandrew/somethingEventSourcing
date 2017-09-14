@@ -11,7 +11,7 @@ type InMemoryEventStore struct {
 
 func (store *InMemoryEventStore) Save(aggregate core.Aggregate) (err error) {
 	var id = aggregate.GetID()
-	var events = aggregate.GetCommittedEvents()
+	var events = aggregate.GetUncommittedEvents()
 	if _, ok := store.events[id]; !ok {
 		store.events[id] = []core.DomainEvent{}
 	}

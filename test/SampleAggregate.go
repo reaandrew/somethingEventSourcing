@@ -15,13 +15,13 @@ type SampleAggregateCreated struct {
 }
 
 type SampleAggregate struct {
-	CommittedEvents []core.DomainEvent
-	ID              uuid.UUID
-	version         int
+	UncommittedEvents []core.DomainEvent
+	ID                uuid.UUID
+	version           int
 }
 
-func (sample *SampleAggregate) GetCommittedEvents() (events []core.DomainEvent) {
-	return sample.CommittedEvents
+func (sample *SampleAggregate) GetUncommittedEvents() (events []core.DomainEvent) {
+	return sample.UncommittedEvents
 }
 
 func (sample *SampleAggregate) GetID() (returnID uuid.UUID) {
@@ -34,7 +34,7 @@ func (sample *SampleAggregate) GetVersion() (version int) {
 }
 
 func (sample *SampleAggregate) Commit() {
-	sample.CommittedEvents = []core.DomainEvent{}
+	sample.UncommittedEvents = []core.DomainEvent{}
 }
 
 func (sample *SampleAggregate) handleSampleAggregateCreated(event SampleAggregateCreated) {
@@ -64,12 +64,12 @@ func (sample *SampleAggregate) replay(domainEvent core.DomainEvent) {
 func (sample *SampleAggregate) publish(event interface{}) {
 	var domainEvent = core.DomainEvent{
 		ID:        uuid.NewV4(),
-		Version:   sample.version + len(sample.CommittedEvents) + 1,
+		Version:   sample.version + len(sample.UncommittedEvents) + 1,
 		Timestamp: time.Now(),
 		Data:      event,
 	}
 	sample.apply(domainEvent)
-	sample.CommittedEvents = append(sample.CommittedEvents, domainEvent)
+	sample.UncommittedEvents = append(sample.UncommittedEvents, domainEvent)
 }
 
 func NewSampleAggregate() (newSampleAggregate *SampleAggregate) {

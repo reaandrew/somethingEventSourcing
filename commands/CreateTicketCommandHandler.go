@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	uuid "github.com/satori/go.uuid"
@@ -33,6 +35,13 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 		ticketInfo.Assignee = assigneeID
 	}
 
+	var ticketID, ticketIDErr = uuid.FromString(command.TicketID)
+	if ticketIDErr != nil {
+		returnErr = models.ErrInvalidTicketID
+		return
+	}
+
+	ticketInfo.TicketID = ticketID
 	ticketInfo.Title = command.Title
 	ticketInfo.Content = command.Content
 
@@ -44,6 +53,7 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 
 	board.AddTicket(ticket, command.Column)
 
+	fmt.Println("Saving Ticket", ticket.GetID())
 	handler.DomainRepository.Save(ticket)
 	handler.DomainRepository.Save(board)
 
