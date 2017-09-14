@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -20,7 +21,7 @@ type TicketInfo struct {
 }
 
 type Ticket struct {
-	CommittedEvents []interface{}
+	CommittedEvents []core.DomainEvent
 	ID              uuid.UUID
 	version         int
 	title           string
@@ -30,32 +31,27 @@ type Ticket struct {
 
 func (ticket *Ticket) handleTicketCreated(event TicketCreated) {
 	ticket.ID = event.TicketID
-	ticket.title = event.Data.Title
-	ticket.content = event.Data.Content
-	ticket.version = event.Version
+	ticket.title = event.Info.Title
+	ticket.content = event.Info.Content
 }
 
 func (ticket *Ticket) handleTicketAssigned(event TicketAssigned) {
 	ticket.assignee = event.Assignee
-	ticket.version = event.Version
 }
 
 func (ticket *Ticket) AssignTo(userID uuid.UUID) (err error) {
 	if userID == uuid.Nil {
 		err = ErrCannotAssignToEmptyUserID
 	} else {
-		ticket.apply(TicketAssigned{
-			TicketID:  ticket.ID,
-			Assignee:  userID,
-			Version:   ticket.version + 1,
-			Timestamp: time.Now(),
-			EventID:   uuid.NewV4(),
+		ticket.publish(TicketAssigned{
+			TicketID: ticket.ID,
+			Assignee: userID,
 		})
 	}
 	return
 }
 
-func (ticket *Ticket) GetCommittedEvents() (events []interface{}) {
+func (ticket *Ticket) GetCommittedEvents() (events []core.DomainEvent) {
 	return ticket.CommittedEvents
 }
 
@@ -73,12 +69,9 @@ func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 	if info.Title == "" {
 		err = ErrNoTicketTitle
 	} else {
-		newTicket.apply(TicketCreated{
-			TicketID:  uuid.NewV4(),
-			Data:      info,
-			Version:   1,
-			EventID:   uuid.NewV4(),
-			Timestamp: time.Now(),
+		newTicket.publish(TicketCreated{
+			TicketID: uuid.NewV4(),
+			Info:     info,
 		})
 
 		if info.Assignee != uuid.Nil {
@@ -88,8 +81,14 @@ func NewTicket(info TicketInfo) (newTicket *Ticket, err error) {
 	return
 }
 
-func (ticket *Ticket) apply(event interface{}) {
-	switch e := event.(type) {
+func (ticket *Ticket) Load(events []core.DomainEvent) {
+	for _, event := range events {
+		ticket.replay(event)
+	}
+}
+
+func (ticket *Ticket) apply(event core.DomainEvent) {
+	switch e := event.Data.(type) {
 	case TicketAssigned:
 		ticket.handleTicketAssigned(e)
 	case TicketCreated:
@@ -98,21 +97,30 @@ func (ticket *Ticket) apply(event interface{}) {
 		panic("Unknown Event")
 
 	}
-	ticket.CommittedEvents = append(ticket.CommittedEvents, event)
+}
+
+func (ticket *Ticket) replay(domainEvent core.DomainEvent) {
+	ticket.apply(domainEvent)
+	ticket.version = domainEvent.Version
+}
+
+func (ticket *Ticket) publish(event interface{}) {
+	var domainEvent = core.DomainEvent{
+		ID:        uuid.NewV4(),
+		Version:   ticket.version + len(ticket.CommittedEvents) + 1,
+		Timestamp: time.Now(),
+		Data:      event,
+	}
+	ticket.apply(domainEvent)
+	ticket.CommittedEvents = append(ticket.CommittedEvents, domainEvent)
 }
 
 type TicketCreated struct {
-	EventID   uuid.UUID
-	Timestamp time.Time
-	Version   int
-	TicketID  uuid.UUID
-	Data      TicketInfo
+	TicketID uuid.UUID
+	Info     TicketInfo
 }
 
 type TicketAssigned struct {
-	EventID   uuid.UUID
-	Timestamp time.Time
-	Version   int
-	TicketID  uuid.UUID
-	Assignee  uuid.UUID
+	TicketID uuid.UUID
+	Assignee uuid.UUID
 }

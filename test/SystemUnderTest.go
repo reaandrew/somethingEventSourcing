@@ -10,11 +10,11 @@ import (
 )
 
 type EventRecorder struct {
-	Events                []interface{}
+	Events                []core.DomainEvent
 	wrappedEventPublisher core.EventPublisher
 }
 
-func (eventRecorder *EventRecorder) Publish(events []interface{}) (err error) {
+func (eventRecorder *EventRecorder) Publish(events []core.DomainEvent) (err error) {
 	eventRecorder.Events = append(eventRecorder.Events, events...)
 	eventRecorder.wrappedEventPublisher.Publish(events)
 	return
@@ -35,7 +35,8 @@ func (sut SystemUnderTest) NumberOfEventsPublished() (value int) {
 }
 
 func (sut SystemUnderTest) GetEvent(index int) (value interface{}) {
-	value = sut.eventRecorder.Events[index]
+	var domainEvent = sut.eventRecorder.Events[index]
+	value = domainEvent.Data
 	return
 }
 
@@ -43,7 +44,7 @@ func NewSystemUnderTest() (sut SystemUnderTest) {
 	var eventStore = inmemory.NewInMemoryEventStore()
 	var eventPublisher = inmemory.NewInMemoryEventPublisher()
 	var eventRecorder = &EventRecorder{
-		Events:                []interface{}{},
+		Events:                []core.DomainEvent{},
 		wrappedEventPublisher: eventPublisher,
 	}
 	var domainRepository = services.NewDomainRepository(eventStore, eventRecorder)

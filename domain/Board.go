@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	"github.com/satori/go.uuid"
 )
 
@@ -33,7 +34,7 @@ func NewBoardColumn(name string) (newBoardColumn BoardColumn) {
 }
 
 type Board struct {
-	CommittedEvents []interface{}
+	CommittedEvents []core.DomainEvent
 	ID              uuid.UUID
 	columns         []BoardColumn
 	version         int
@@ -45,17 +46,14 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 		err = findErr
 	}
 	var event = TicketAddedToBoard{
-		Version:   board.version + 1,
-		TicketID:  ticket.ID,
-		Column:    column,
-		EventID:   uuid.NewV4(),
-		Timestamp: time.Now(),
+		TicketID: ticket.ID,
+		Column:   column,
 	}
-	board.apply(event)
+	board.publish(event)
 	return
 }
 
-func (board *Board) GetCommittedEvents() (events []interface{}) {
+func (board *Board) GetCommittedEvents() (events []core.DomainEvent) {
 	return board.CommittedEvents
 }
 
@@ -87,28 +85,37 @@ func (board *Board) handleTicketAddedToBoard(event TicketAddedToBoard) {
 	board.columns[0].Tickets = append(board.columns[0].Tickets, event.TicketID)
 }
 
-func (board *Board) Load(events []interface{}) {
+func (board *Board) Load(events []core.DomainEvent) {
 	for _, event := range events {
-		board.applyEvent(event)
+		board.replay(event)
 	}
 }
 
-func (board *Board) applyEvent(event interface{}) {
-	switch e := event.(type) {
+func (board *Board) apply(event core.DomainEvent) {
+	switch e := event.Data.(type) {
 	case BoardCreated:
 		board.handleBoardCreated(e)
-		board.version = e.Version
 	case TicketAddedToBoard:
 		board.handleTicketAddedToBoard(e)
-		board.version = e.Version
 	default:
 		panic("Unknown Event")
 	}
 }
 
-func (board *Board) apply(event interface{}) {
-	board.applyEvent(event)
-	board.CommittedEvents = append(board.CommittedEvents, event)
+func (board *Board) replay(domainEvent core.DomainEvent) {
+	board.apply(domainEvent)
+	board.version = domainEvent.Version
+}
+
+func (board *Board) publish(event interface{}) {
+	var domainEvent = core.DomainEvent{
+		ID:        uuid.NewV4(),
+		Version:   board.version + len(board.CommittedEvents) + 1,
+		Timestamp: time.Now(),
+		Data:      event,
+	}
+	board.apply(domainEvent)
+	board.CommittedEvents = append(board.CommittedEvents, domainEvent)
 }
 
 func NewBoard(info BoardInfo) (newBoard *Board) {
@@ -117,28 +124,19 @@ func NewBoard(info BoardInfo) (newBoard *Board) {
 	for _, column := range info.Columns {
 		boardColumns = append(boardColumns, NewBoardColumn(column))
 	}
-	newBoard.apply(BoardCreated{
-		Version:   1,
-		BoardID:   uuid.NewV4(),
-		Columns:   boardColumns,
-		EventID:   uuid.NewV4(),
-		Timestamp: time.Now(),
+	newBoard.publish(BoardCreated{
+		BoardID: uuid.NewV4(),
+		Columns: boardColumns,
 	})
 	return
 }
 
 type TicketAddedToBoard struct {
-	EventID   uuid.UUID
-	Timestamp time.Time
-	Version   int
-	TicketID  uuid.UUID
-	Column    BoardColumn
+	TicketID uuid.UUID
+	Column   BoardColumn
 }
 
 type BoardCreated struct {
-	EventID   uuid.UUID
-	Timestamp time.Time
-	Version   int
-	BoardID   uuid.UUID
-	Columns   []BoardColumn
+	BoardID uuid.UUID
+	Columns []BoardColumn
 }

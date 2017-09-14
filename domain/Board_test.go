@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/reaandrew/eventsourcing-in-go/domain"
+	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,13 +26,15 @@ func TestCreatingABoard(t *testing.T) {
 	})
 
 	assert.Equal(t, len(board.CommittedEvents), 1)
-	assert.Equal(t, len(board.CommittedEvents[0].(domain.BoardCreated).Columns), 3)
-	assert.IsType(t, domain.BoardCreated{}, board.CommittedEvents[0])
 
-	var event = board.CommittedEvents[0].(domain.BoardCreated)
-	assert.Equal(t, event.Version, 1)
-	assert.NotEmpty(t, uuid.Nil, event.EventID)
-	assert.False(t, event.Timestamp.IsZero())
+	var domainEvent = board.CommittedEvents[0]
+	var eventData = domainEvent.Data.(domain.BoardCreated)
+
+	assert.Equal(t, len(eventData.Columns), 3)
+	assert.IsType(t, domain.BoardCreated{}, eventData)
+	assert.Equal(t, domainEvent.Version, 1)
+	assert.NotEqual(t, uuid.Nil, domainEvent.ID)
+	assert.False(t, domainEvent.Timestamp.IsZero())
 }
 
 func TestAddingATicketToABoard(t *testing.T) {
@@ -49,13 +52,15 @@ func TestAddingATicketToABoard(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, len(board.CommittedEvents), 2)
-	assert.IsType(t, domain.BoardCreated{}, board.CommittedEvents[0])
-	assert.IsType(t, domain.TicketAddedToBoard{}, board.CommittedEvents[1])
+	assert.IsType(t, domain.BoardCreated{}, board.CommittedEvents[0].Data)
+	assert.IsType(t, domain.TicketAddedToBoard{}, board.CommittedEvents[1].Data)
 
-	var event = board.CommittedEvents[1].(domain.TicketAddedToBoard)
-	assert.Equal(t, columns[0], event.Column.Name)
-	assert.NotEmpty(t, uuid.Nil, event.EventID)
-	assert.False(t, event.Timestamp.IsZero())
+	var domainEvent = board.CommittedEvents[1]
+	var eventData = domainEvent.Data.(domain.TicketAddedToBoard)
+
+	assert.Equal(t, columns[0], eventData.Column.Name)
+	assert.NotEmpty(t, uuid.Nil, domainEvent.ID)
+	assert.False(t, domainEvent.Timestamp.IsZero())
 }
 
 func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.T) {
@@ -70,13 +75,15 @@ func TestAddingATicketToAColumnWhichDoesNotExistOnABoardReturnsError(t *testing.
 }
 
 func TestLoadingABoardFromEvents(t *testing.T) {
-	var events = []interface{}{
-		domain.BoardCreated{
-			EventID:   uuid.NewV4(),
+	var events = []core.DomainEvent{
+		core.DomainEvent{
+			ID:        uuid.NewV4(),
 			Timestamp: time.Now(),
 			Version:   1,
-			BoardID:   uuid.NewV4(),
-			Columns:   []domain.BoardColumn{},
+			Data: domain.BoardCreated{
+				BoardID: uuid.NewV4(),
+				Columns: []domain.BoardColumn{},
+			},
 		},
 	}
 
