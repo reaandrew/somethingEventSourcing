@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/reaandrew/eventsourcing-in-go/commands"
-	"github.com/reaandrew/eventsourcing-in-go/domain"
+	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,5 +24,5 @@ func TestCreateBoardCommandPublishesBoardCreated(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, sut.NumberOfEventsPublished())
-	assert.IsType(t, domain.BoardCreated{}, sut.GetEvent(0))
+	assert.IsType(t, models.BoardCreated{}, sut.GetEvent(0))
 }

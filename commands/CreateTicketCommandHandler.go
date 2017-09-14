@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain"
+	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	uuid "github.com/satori/go.uuid"
 )
@@ -23,7 +23,7 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 		return
 	}
 
-	var ticketInfo = domain.TicketInfo{}
+	var ticketInfo = models.TicketInfo{}
 	var assigneeID, assigneeErr = uuid.FromString(command.Assignee)
 	if command.Assignee != "" && assigneeErr != nil {
 		returnErr = ErrInvalidAssigneeID
@@ -36,7 +36,7 @@ func (handler CreateTicketCommandHandler) Execute(command CreateTicketCommand) (
 	ticketInfo.Title = command.Title
 	ticketInfo.Content = command.Content
 
-	var ticket, ticketErr = domain.NewTicket(ticketInfo)
+	var ticket, ticketErr = models.NewTicket(ticketInfo)
 	if ticketErr != nil {
 		returnErr = ticketErr
 		return

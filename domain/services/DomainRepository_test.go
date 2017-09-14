@@ -3,7 +3,7 @@ package services_test
 import (
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain"
+	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -12,7 +12,7 @@ import (
 func TestDomainRepositoryGetAggregateReplaysEvents(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 
-	var board = domain.NewBoard(domain.BoardInfo{
+	var board = models.NewBoard(models.BoardInfo{
 		Columns: []string{"A", "B", "C"},
 	})
 	sut.DomainRepository.Save(board)

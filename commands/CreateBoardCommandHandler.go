@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain"
+	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 )
 
@@ -10,7 +10,7 @@ type CreateBoardCommandHandler struct {
 }
 
 func (handler CreateBoardCommandHandler) Execute(command CreateBoardCommand) (returnErr error) {
-	var board = domain.NewBoard(domain.BoardInfo{
+	var board = models.NewBoard(models.BoardInfo{
 		Name:    command.Name,
 		Columns: command.Columns,
 	})

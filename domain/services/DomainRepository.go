@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain"
 	"github.com/reaandrew/eventsourcing-in-go/domain/core"
+	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -16,15 +16,15 @@ func (repository DomainRepository) Save(aggregate core.Aggregate) {
 	repository.eventPublisher.Publish(aggregate.GetCommittedEvents())
 }
 
-func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard *domain.Board, returnErr error) {
-	newBoard = &domain.Board{}
+func (repository DomainRepository) GetBoard(id uuid.UUID) (newBoard *models.Board, returnErr error) {
+	newBoard = &models.Board{}
 	var events, err = repository.eventStore.GetEvents(id)
 	if err != nil {
 		returnErr = err
 		return
 	}
 	if len(events) == 0 {
-		returnErr = domain.ErrBoardNotExist
+		returnErr = models.ErrBoardNotExist
 		return
 	}
 	newBoard.Load(events)
