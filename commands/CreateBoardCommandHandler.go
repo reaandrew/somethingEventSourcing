@@ -17,12 +17,18 @@ func (handler CreateBoardCommandHandler) Execute(command CreateBoardCommand) (re
 		returnErr = models.ErrInvalidBoardID
 		return
 	}
-
-	var board = models.NewBoard(models.BoardInfo{
+	var boardInfo = models.BoardInfo{
 		BoardID: boardID,
 		Name:    command.Name,
-		Columns: command.Columns,
-	})
+		Columns: []models.BoardColumnInfo{},
+	}
+	for _, colName := range command.Columns {
+		boardInfo.Columns = append(boardInfo.Columns, models.BoardColumnInfo{
+			ID:   uuid.NewV4(),
+			Name: colName,
+		})
+	}
+	var board = models.NewBoard(boardInfo)
 	handler.DomainRepository.Save(board)
 	return
 }

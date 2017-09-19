@@ -15,7 +15,11 @@ func TestDomainRepositoryGetAggregateReplaysEvents(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 
 	var board = models.NewBoard(models.BoardInfo{
-		Columns: []string{"A", "B", "C"},
+		Columns: []models.BoardColumnInfo{
+			models.BoardColumnInfo{Name: "A", ID: uuid.NewV4()},
+			models.BoardColumnInfo{Name: "B", ID: uuid.NewV4()},
+			models.BoardColumnInfo{Name: "C", ID: uuid.NewV4()},
+		},
 	})
 	sut.DomainRepository.Save(board)
 

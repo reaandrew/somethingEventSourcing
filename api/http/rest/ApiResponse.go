@@ -20,7 +20,7 @@ func NewApiResponse() (newResponse ApiResponse) {
 func LoadApiResponse(data []byte) (response ApiResponse) {
 	json.Unmarshal(data, &response)
 	var links = response[ApiResponseLinkKey].([]interface{})
-	var returnArray = make([]HttpLink, len(links))
+	var returnArray = []HttpLink{}
 	for index, _ := range links {
 		var obj = links[index].(map[string]interface{})
 		var link = HttpLink{

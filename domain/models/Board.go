@@ -17,7 +17,12 @@ var (
 type BoardInfo struct {
 	BoardID uuid.UUID
 	Name    string
-	Columns []string
+	Columns []BoardColumnInfo
+}
+
+type BoardColumnInfo struct {
+	ID   uuid.UUID
+	Name string
 }
 
 type BoardColumn struct {
@@ -49,7 +54,10 @@ func (board *Board) AddTicket(ticket *Ticket, columnName string) (err error) {
 	}
 	var event = TicketAddedToBoard{
 		TicketID: ticket.ID,
-		Column:   column,
+		Column: BoardColumnInfo{
+			ID:   column.ID,
+			Name: column.Name,
+		},
 	}
 	board.publish(event)
 	return
@@ -84,7 +92,14 @@ func (board *Board) findColumn(columnName string) (matchingBoard BoardColumn, er
 
 func (board *Board) handleBoardCreated(event BoardCreated) {
 	board.ID = event.BoardID
-	board.columns = event.Columns
+	board.columns = []BoardColumn{}
+	for _, col := range event.Columns {
+		board.columns = append(board.columns, BoardColumn{
+			ID:      col.ID,
+			Name:    col.Name,
+			Tickets: []uuid.UUID{},
+		})
+	}
 }
 
 func (board *Board) handleTicketAddedToBoard(event TicketAddedToBoard) {
@@ -126,25 +141,21 @@ func (board *Board) publish(event interface{}) {
 
 func NewBoard(info BoardInfo) (newBoard *Board) {
 	newBoard = &Board{}
-	var boardColumns = []BoardColumn{}
-	for _, column := range info.Columns {
-		boardColumns = append(boardColumns, NewBoardColumn(column))
-	}
 	newBoard.publish(BoardCreated{
 		BoardID: info.BoardID,
 		Name:    info.Name,
-		Columns: boardColumns,
+		Columns: info.Columns,
 	})
 	return
 }
 
 type TicketAddedToBoard struct {
 	TicketID uuid.UUID
-	Column   BoardColumn
+	Column   BoardColumnInfo
 }
 
 type BoardCreated struct {
 	BoardID uuid.UUID
 	Name    string
-	Columns []BoardColumn
+	Columns []BoardColumnInfo
 }

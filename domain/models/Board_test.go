@@ -10,11 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createColumns() (columns []string) {
-	columns = []string{
-		"To Do",
-		"In Progress",
-		"Completed",
+func createColumns() (columns []models.BoardColumnInfo) {
+	columns = []models.BoardColumnInfo{
+		models.BoardColumnInfo{Name: "To Do", ID: uuid.NewV4()},
+		models.BoardColumnInfo{Name: "In Progress", ID: uuid.NewV4()},
+		models.BoardColumnInfo{Name: "Completed", ID: uuid.NewV4()},
 	}
 	return
 }
@@ -58,7 +58,7 @@ func TestAddingATicketToABoard(t *testing.T) {
 	var domainEvent = board.UncommittedEvents[1]
 	var eventData = domainEvent.Data.(models.TicketAddedToBoard)
 
-	assert.Equal(t, columns[0], eventData.Column.Name)
+	assert.Equal(t, columns[0].Name, eventData.Column.Name)
 	assert.NotEmpty(t, uuid.Nil, domainEvent.ID)
 	assert.False(t, domainEvent.Timestamp.IsZero())
 }
@@ -82,7 +82,7 @@ func TestLoadingABoardFromEvents(t *testing.T) {
 			Version:   1,
 			Data: models.BoardCreated{
 				BoardID: uuid.NewV4(),
-				Columns: []models.BoardColumn{},
+				Columns: []models.BoardColumnInfo{},
 			},
 		},
 	}

@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	uuid "github.com/satori/go.uuid"
@@ -19,7 +17,6 @@ func (repository DomainRepository) Save(aggregate core.Aggregate) {
 		repository.trackedAggregates[aggregate.GetID()] = aggregate
 	}
 
-	fmt.Println("Saving", aggregate.GetID())
 	repository.eventStore.Save(aggregate)
 	repository.eventPublisher.Publish(aggregate.GetUncommittedEvents())
 }

@@ -3,6 +3,7 @@ package rest_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -40,6 +41,7 @@ func TestCreatingABoard(t *testing.T) {
 
 	var apiResponse = rest.LoadApiResponse(resp.Body.Bytes())
 
+	fmt.Println(apiResponse.Links())
 	assert.Equal(t, len(apiResponse.Links()), 1)
 }
 

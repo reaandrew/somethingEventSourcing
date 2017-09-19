@@ -1,8 +1,6 @@
 package rest
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
@@ -25,8 +23,6 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 
 				commandExecutor.Execute(createBoardCommand)
 
-				fmt.Println(NewApiResponse())
-
 				c.JSON(202, NewApiResponse().AddLink(HttpLink{
 					Rel:  "self",
 					Href: "/v1/boards/" + createBoardCommand.BoardID,
@@ -34,7 +30,6 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 			})
 
 			boards.GET("/:id", func(c *gin.Context) {
-				fmt.Println("Getting Board")
 				var query = queries.GetBoardByIDRequest{
 					BoardID: c.Param("id"),
 				}
