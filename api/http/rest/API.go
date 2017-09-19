@@ -2,10 +2,10 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/reaandrew/eventsourcing-in-go/commands"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
-	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
-	"github.com/reaandrew/eventsourcing-in-go/queries"
+	"github.com/reaandrew/forora/commands"
+	"github.com/reaandrew/forora/domain/services"
+	"github.com/reaandrew/forora/infrastructure/inmemory"
+	"github.com/reaandrew/forora/queries"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -30,6 +30,22 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 					Rel:  "tickets",
 					Href: "/v1/boards/" + createBoardCommand.BoardID + "/tickets",
 				}))
+			})
+
+			boards.GET("", func(c *gin.Context) {
+				var query = queries.GetAllBoardsRequest{}
+
+				var response, err = queryExecutor.Execute(query)
+
+				if err != nil {
+					//These need to change to return server errors
+					panic(err)
+				}
+
+				var getAllBoardsResponse = response.(queries.GetAllBoardsResponse)
+
+				c.JSON(200, NewApiResponse().
+					SetData("boards", getAllBoardsResponse.Boards))
 			})
 
 			boards.GET("/:id", func(c *gin.Context) {

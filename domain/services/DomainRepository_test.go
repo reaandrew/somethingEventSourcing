@@ -3,10 +3,10 @@ package services_test
 import (
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
-	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
-	"github.com/reaandrew/eventsourcing-in-go/test"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/domain/services"
+	"github.com/reaandrew/forora/infrastructure/inmemory"
+	"github.com/reaandrew/forora/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

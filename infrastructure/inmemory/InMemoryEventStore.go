@@ -1,7 +1,7 @@
 package inmemory
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain/core"
+	"github.com/reaandrew/forora/domain/core"
 	uuid "github.com/satori/go.uuid"
 )
 

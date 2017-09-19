@@ -3,8 +3,8 @@ package test_test
 import (
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/test"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/test"
 	"github.com/stretchr/testify/assert"
 )
 

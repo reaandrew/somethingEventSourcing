@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
+	"github.com/reaandrew/forora/domain/services"
 )
 
 type CommandExecutor struct {

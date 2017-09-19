@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain/core"
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/queries/dtos"
+	"github.com/reaandrew/forora/domain/core"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/queries/dtos"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/domain/services"
 	uuid "github.com/satori/go.uuid"
 )
 

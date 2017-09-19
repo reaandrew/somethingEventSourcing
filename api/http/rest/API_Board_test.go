@@ -4,11 +4,29 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/api/http/rest"
-	"github.com/reaandrew/eventsourcing-in-go/commands"
-	"github.com/reaandrew/eventsourcing-in-go/test"
+	"github.com/reaandrew/forora/api/http/rest"
+	"github.com/reaandrew/forora/commands"
+	"github.com/reaandrew/forora/test"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestGetAllBoards(t *testing.T) {
+	var sut = test.NewSystemUnderTest()
+
+	var numberOfBoards = 10
+	sut.CreateSampleBoards(numberOfBoards)
+
+	var resp = sut.Get("/v1/boards")
+
+	assert.Equal(t, 200, resp.Code)
+
+	var apiResponse = WrapApiResponseWithAssertions(rest.LoadApiResponse(resp.Body.Bytes()), t)
+
+	apiResponse.
+		AssertData("boards").
+		AssertDataLength("boards", numberOfBoards)
+
+}
 
 func TestCreatingABoard(t *testing.T) {
 	var sut = test.NewSystemUnderTest()

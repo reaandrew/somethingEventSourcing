@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/gin-gonic/gin"
 	"github.com/icrowley/fake"
-	"github.com/reaandrew/eventsourcing-in-go/api/http/rest"
-	"github.com/reaandrew/eventsourcing-in-go/commands"
-	"github.com/reaandrew/eventsourcing-in-go/domain/core"
-	"github.com/reaandrew/eventsourcing-in-go/domain/services"
-	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
-	"github.com/reaandrew/eventsourcing-in-go/queries"
+	"github.com/reaandrew/forora/api/http/rest"
+	"github.com/reaandrew/forora/commands"
+	"github.com/reaandrew/forora/domain/core"
+	"github.com/reaandrew/forora/domain/services"
+	"github.com/reaandrew/forora/infrastructure/inmemory"
+	"github.com/reaandrew/forora/queries"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -55,6 +56,13 @@ func (sut SystemUnderTest) GetEvent(index int) (value interface{}) {
 	var domainEvent = sut.eventRecorder.Events[index]
 	value = domainEvent.Data
 	return
+}
+
+func (sut SystemUnderTest) CreateSampleBoards(number int) {
+	for i := 0; i < number; i++ {
+		var name = petname.Generate(2, " ")
+		sut.CreateSampleBoard(name)
+	}
 }
 
 func (sut SystemUnderTest) CreateSampleBoard(name string) (boardID uuid.UUID) {

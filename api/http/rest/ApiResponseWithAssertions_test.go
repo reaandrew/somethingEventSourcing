@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/api/http/rest"
+	"github.com/reaandrew/forora/api/http/rest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,6 +41,14 @@ func (response ApiResponseWithAssertions) AssertData(key string) (next ApiRespon
 	if _, ok := response.obj[key]; !ok {
 		assert.Fail(response.t, fmt.Sprintf("data not found key=%s", key))
 	}
+	return
+}
+
+func (response ApiResponseWithAssertions) AssertDataLength(key string, expected int) (next ApiResponseWithAssertions) {
+	next = response
+	response.AssertData(key)
+	var items = response.obj[key].([]interface{})
+	assert.Equal(response.t, expected, len(items))
 	return
 }
 

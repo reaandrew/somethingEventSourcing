@@ -3,8 +3,8 @@ package dtos
 import (
 	"time"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain/core"
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
+	"github.com/reaandrew/forora/domain/core"
+	"github.com/reaandrew/forora/domain/models"
 )
 
 type Board struct {

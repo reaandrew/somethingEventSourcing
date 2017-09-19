@@ -1,9 +1,9 @@
 package inmemory
 
 import (
-	"github.com/reaandrew/eventsourcing-in-go/domain/core"
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/queries/dtos"
+	"github.com/reaandrew/forora/domain/core"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/queries/dtos"
 )
 
 type InMemoryEventPublisher struct {

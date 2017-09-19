@@ -3,7 +3,7 @@ package models_test
 import (
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
+	"github.com/reaandrew/forora/domain/models"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

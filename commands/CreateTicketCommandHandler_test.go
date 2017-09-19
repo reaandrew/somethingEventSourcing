@@ -3,9 +3,9 @@ package commands_test
 import (
 	"testing"
 
-	"github.com/reaandrew/eventsourcing-in-go/commands"
-	"github.com/reaandrew/eventsourcing-in-go/domain/models"
-	"github.com/reaandrew/eventsourcing-in-go/test"
+	"github.com/reaandrew/forora/commands"
+	"github.com/reaandrew/forora/domain/models"
+	"github.com/reaandrew/forora/test"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
