@@ -1,1 +1,4 @@
 *.swp
+eventsourcing-in-go
+coverage-all.out
+coverage.out

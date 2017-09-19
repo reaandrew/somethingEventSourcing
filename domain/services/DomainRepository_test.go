@@ -37,7 +37,7 @@ func TestDomainRepositoryGetAggregateReturnsErrorWhenIDNotFound(t *testing.T) {
 func TestCommitClearsCommittedEventsFromAllAggregatesSaved(t *testing.T) {
 	var domainRepository = services.NewDomainRepository(
 		inmemory.NewInMemoryEventStore(),
-		inmemory.NewInMemoryEventPublisher())
+		inmemory.NewInMemoryEventPublisher(map[string]interface{}{}))
 
 	var sample1 = test.NewSampleAggregate()
 	var sample2 = test.NewSampleAggregate()

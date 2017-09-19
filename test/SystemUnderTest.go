@@ -8,6 +8,7 @@ import (
 	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	"github.com/reaandrew/eventsourcing-in-go/infrastructure/inmemory"
+	"github.com/reaandrew/eventsourcing-in-go/queries"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -31,6 +32,7 @@ type SystemUnderTest struct {
 	EventPublisher   core.EventPublisher
 	DomainRepository services.DomainRepository
 	CommandExecutor  commands.CommandExecutor
+	QueryExecutor    queries.QueryExecutor
 	eventRecorder    *EventRecorder
 }
 
@@ -96,8 +98,11 @@ func (sut SystemUnderTest) ClearRecordedEvents() {
 }
 
 func NewSystemUnderTest() (sut SystemUnderTest) {
+	var queryStore = map[string]interface{}{}
+	var queryExecutor = inmemory.NewInMemoryQueryExecutor(queryStore)
+
 	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher()
+	var eventPublisher = inmemory.NewInMemoryEventPublisher(queryStore)
 	var eventRecorder = &EventRecorder{
 		Events:                []core.DomainEvent{},
 		wrappedEventPublisher: eventPublisher,
@@ -110,6 +115,7 @@ func NewSystemUnderTest() (sut SystemUnderTest) {
 		EventPublisher:   eventRecorder,
 		DomainRepository: domainRepository,
 		CommandExecutor:  commandExecutor,
+		QueryExecutor:    queryExecutor,
 		eventRecorder:    eventRecorder,
 	}
 	return

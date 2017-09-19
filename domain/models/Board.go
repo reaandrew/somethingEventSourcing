@@ -132,6 +132,7 @@ func NewBoard(info BoardInfo) (newBoard *Board) {
 	}
 	newBoard.publish(BoardCreated{
 		BoardID: info.BoardID,
+		Name:    info.Name,
 		Columns: boardColumns,
 	})
 	return
@@ -144,5 +145,6 @@ type TicketAddedToBoard struct {
 
 type BoardCreated struct {
 	BoardID uuid.UUID
+	Name    string
 	Columns []BoardColumn
 }
