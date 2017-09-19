@@ -16,8 +16,8 @@ import (
 )
 
 func TestCreatingABoard(t *testing.T) {
-
 	var sut = test.NewSystemUnderTest()
+
 	var command = commands.CreateBoardCommand{
 		Name: "Some Board",
 		Columns: []string{
@@ -27,14 +27,7 @@ func TestCreatingABoard(t *testing.T) {
 		},
 	}
 
-	var jsonBytes, _ = json.Marshal(command)
-	var reader = bytes.NewReader(jsonBytes)
-	var request, _ = http.NewRequest("POST", "/v1/boards", reader)
-	var resp = httptest.NewRecorder()
-	var router *gin.Engine
-	router = rest.SetupRouter(sut.CommandExecutor, sut.QueryExecutor)
-
-	router.ServeHTTP(resp, request)
+	var resp = sut.Post(command, "/v1/boards")
 
 	assert.Equal(t, resp.Code, 202)
 

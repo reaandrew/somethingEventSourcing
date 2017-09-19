@@ -1,9 +1,15 @@
 package test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 
+	"github.com/gin-gonic/gin"
 	"github.com/icrowley/fake"
+	"github.com/reaandrew/eventsourcing-in-go/api/http/rest"
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/domain/core"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
@@ -95,6 +101,18 @@ func (sut SystemUnderTest) CreateSampleTicket(boardID uuid.UUID, column string) 
 
 func (sut SystemUnderTest) ClearRecordedEvents() {
 	sut.eventRecorder.Clear()
+}
+
+func (sut SystemUnderTest) Post(obj interface{}, url string) *httptest.ResponseRecorder {
+	var jsonBytes, _ = json.Marshal(obj)
+	var reader = bytes.NewReader(jsonBytes)
+	var request, _ = http.NewRequest("POST", url, reader)
+	var resp = httptest.NewRecorder()
+	var router *gin.Engine
+	router = rest.SetupRouter(sut.CommandExecutor, sut.QueryExecutor)
+
+	router.ServeHTTP(resp, request)
+	return resp
 }
 
 func NewSystemUnderTest() (sut SystemUnderTest) {
