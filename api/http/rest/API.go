@@ -23,9 +23,12 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 
 				commandExecutor.Execute(createBoardCommand)
 
-				c.JSON(202, NewApiResponse().AddLink(HttpLink{
+				c.JSON(202, NewApiResponse().AddLink(Link{
 					Rel:  "self",
 					Href: "/v1/boards/" + createBoardCommand.BoardID,
+				}).AddLink(Link{
+					Rel:  "tickets",
+					Href: "/v1/boards/" + createBoardCommand.BoardID + "/tickets",
 				}))
 			})
 
@@ -43,6 +46,14 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 				var getBoardResponse = response.(queries.GetBoardByIDResponse)
 
 				c.JSON(200, NewApiResponse().
+					AddLink(Link{
+						Rel:  "self",
+						Href: "/v1/boards/" + getBoardResponse.Board.ID,
+					}).
+					AddLink(Link{
+						Rel:  "tickets",
+						Href: "/v1/boards/" + getBoardResponse.Board.ID + "/tickets",
+					}).
 					SetData("board", getBoardResponse.Board))
 			})
 
@@ -59,7 +70,7 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 				var ticketLink = boardLink + "/tickets/" + createTicketCommand.TicketID
 
 				c.JSON(202, NewApiResponse().AddLink(
-					HttpLink{
+					Link{
 						Rel:  "self",
 						Href: ticketLink,
 					}))

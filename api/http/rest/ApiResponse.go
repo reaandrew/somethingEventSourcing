@@ -1,11 +1,8 @@
 package rest
 
-import "encoding/json"
-
-type HttpLink struct {
-	Rel  string `json:"rel"`
-	Href string `json:"href"`
-}
+import (
+	"encoding/json"
+)
 
 const ApiResponseLinkKey = "links"
 
@@ -13,17 +10,17 @@ type ApiResponse map[string]interface{}
 
 func NewApiResponse() (newResponse ApiResponse) {
 	newResponse = map[string]interface{}{}
-	newResponse[ApiResponseLinkKey] = []HttpLink{}
+	newResponse[ApiResponseLinkKey] = []Link{}
 	return
 }
 
 func LoadApiResponse(data []byte) (response ApiResponse) {
 	json.Unmarshal(data, &response)
 	var links = response[ApiResponseLinkKey].([]interface{})
-	var returnArray = []HttpLink{}
+	var returnArray = []Link{}
 	for index, _ := range links {
 		var obj = links[index].(map[string]interface{})
-		var link = HttpLink{
+		var link = Link{
 			Href: obj["href"].(string),
 			Rel:  obj["rel"].(string),
 		}
@@ -35,7 +32,7 @@ func LoadApiResponse(data []byte) (response ApiResponse) {
 	return
 }
 
-func (response ApiResponse) AddLink(link HttpLink) (next ApiResponse) {
+func (response ApiResponse) AddLink(link Link) (next ApiResponse) {
 	next = response
 	var linkArray = response.Links()
 	linkArray = append(linkArray, link)
@@ -49,16 +46,6 @@ func (response ApiResponse) SetData(key string, data interface{}) (next ApiRespo
 	return
 }
 
-func (response ApiResponse) LinkForRel(rel string) (returnLink HttpLink) {
-	for _, link := range response.Links() {
-		if link.Rel == rel {
-			returnLink = link
-			break
-		}
-	}
-	return
-}
-
-func (response ApiResponse) Links() (links []HttpLink) {
-	return response[ApiResponseLinkKey].([]HttpLink)
+func (response ApiResponse) Links() (links []Link) {
+	return response[ApiResponseLinkKey].([]Link)
 }
