@@ -115,6 +115,15 @@ func (sut SystemUnderTest) Post(obj interface{}, url string) *httptest.ResponseR
 	return resp
 }
 
+func (sut SystemUnderTest) Get(url string) *httptest.ResponseRecorder {
+	var req, _ = http.NewRequest("GET", url, nil)
+	var resp = httptest.NewRecorder()
+	var router *gin.Engine
+	router = rest.SetupRouter(sut.CommandExecutor, sut.QueryExecutor)
+	router.ServeHTTP(resp, req)
+	return resp
+}
+
 func NewSystemUnderTest() (sut SystemUnderTest) {
 	var queryStore = map[string]interface{}{}
 	var queryExecutor = inmemory.NewInMemoryQueryExecutor(queryStore)

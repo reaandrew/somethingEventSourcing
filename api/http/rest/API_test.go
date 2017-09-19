@@ -2,11 +2,8 @@ package rest_test
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/reaandrew/eventsourcing-in-go/api/http/rest"
 	"github.com/reaandrew/eventsourcing-in-go/commands"
 	"github.com/reaandrew/eventsourcing-in-go/test"
@@ -60,11 +57,8 @@ func TestGettingABoard(t *testing.T) {
 	var sut = test.NewSystemUnderTest()
 	var boardID = sut.CreateSampleBoard("some board")
 
-	var req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/boards/%s", boardID), nil)
-	var resp = httptest.NewRecorder()
-	var router *gin.Engine
-	router = rest.SetupRouter(sut.CommandExecutor, sut.QueryExecutor)
-	router.ServeHTTP(resp, req)
+	var url = fmt.Sprintf("/v1/boards/%s", boardID)
+	var resp = sut.Get(url)
 
 	var apiResponse = WrapApiResponseWithAssertions(rest.LoadApiResponse(resp.Body.Bytes()), t)
 
