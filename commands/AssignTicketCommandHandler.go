@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/reaandrew/eventsourcing-in-go/domain/models"
 	"github.com/reaandrew/eventsourcing-in-go/domain/services"
 	uuid "github.com/satori/go.uuid"
@@ -20,7 +18,6 @@ func (handler AssignTicketCommandHandler) Execute(command AssignTicketCommand) (
 		return
 	}
 
-	fmt.Println("TicketID to GET", ticketID)
 	var ticket, ticketErr = handler.DomainRepository.GetTicket(ticketID)
 
 	if ticketErr != nil {
