@@ -1,8 +1,6 @@
 package rest_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -47,15 +45,8 @@ func TestAddingATicketToABoard(t *testing.T) {
 		Title:  "some ticket",
 	}
 
-	var jsonBytes, _ = json.Marshal(command)
-	var reader = bytes.NewReader(jsonBytes)
 	var url = "/v1/boards/" + boardID.String() + "/tickets/"
-	var request, _ = http.NewRequest("POST", url, reader)
-	var resp = httptest.NewRecorder()
-	var router *gin.Engine
-	router = rest.SetupRouter(sut.CommandExecutor, sut.QueryExecutor)
-
-	router.ServeHTTP(resp, request)
+	var resp = sut.Post(command, url)
 
 	assert.Equal(t, resp.Code, 202)
 
