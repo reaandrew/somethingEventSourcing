@@ -31,28 +31,14 @@ func NewInMemoryEventPublisher(queryStore map[string]interface{}) (newPublisher 
 }
 
 func (publisher *InMemoryEventPublisher) updateQueryStore(event core.DomainEvent) {
-	switch t := event.Data.(type) {
+	switch event.Data.(type) {
 	case models.BoardCreated:
 		if _, ok := publisher.queryStore["boards"]; !ok {
 			publisher.queryStore["boards"] = map[string]dtos.Board{}
 		}
 
 		var data = publisher.queryStore["boards"].(map[string]dtos.Board)
-
-		var columns = make([]dtos.BoardColumn, len(t.Columns))
-
-		for index, col := range t.Columns {
-			columns[index].ID = col.ID.String()
-			columns[index].Name = col.Name
-		}
-
-		data[t.BoardID.String()] = dtos.Board{
-			Columns: columns,
-			Created: event.Timestamp,
-			ID:      t.BoardID.String(),
-			Name:    t.Name,
-			Updated: event.Timestamp,
-			Version: event.Version,
-		}
+		var board = dtos.Board{}.MapDomainCreated(event)
+		data[board.ID] = board
 	}
 }
