@@ -28,3 +28,15 @@ func TestCreateBoardCommandPublishesBoardCreated(t *testing.T) {
 	assert.Equal(t, 1, sut.NumberOfEventsPublished())
 	assert.IsType(t, models.BoardCreated{}, sut.GetEvent(0))
 }
+
+func TestReturnErrInvalidBoardID(t *testing.T) {
+	var sut = test.NewSystemUnderTest()
+
+	var command = commands.CreateBoardCommand{
+		BoardID: "",
+	}
+
+	var err = sut.CommandExecutor.Execute(command)
+
+	assert.Equal(t, err, models.ErrInvalidBoardID)
+}
