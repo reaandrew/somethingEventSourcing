@@ -33,5 +33,10 @@ func TestMappingBoardCreatedToBoard(t *testing.T) {
 	var boardCreatedEvent = event.Data.(models.BoardCreated)
 
 	assert.Equal(t, board.ID, boardCreatedEvent.BoardID.String())
+	assert.Equal(t, board.Name, boardCreatedEvent.Name)
 	assert.Equal(t, len(board.Columns), len(boardCreatedEvent.Columns))
+	assert.Equal(t, board.Columns[0].ID, boardCreatedEvent.Columns[0].ID.String())
+	assert.Equal(t, board.Created, event.Timestamp)
+	assert.Equal(t, board.Updated, event.Timestamp)
+	assert.Equal(t, board.Version, event.Version)
 }

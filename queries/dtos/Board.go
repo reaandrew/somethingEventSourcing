@@ -18,6 +18,7 @@ type Board struct {
 
 func (board Board) MapDomainCreated(event core.DomainEvent) (mappedBoard Board) {
 	var boardCreatedEvent = event.Data.(models.BoardCreated)
+	mappedBoard.Name = boardCreatedEvent.Name
 	mappedBoard.ID = boardCreatedEvent.BoardID.String()
 	mappedBoard.Columns = []BoardColumn{}
 	for _, col := range boardCreatedEvent.Columns {
@@ -26,5 +27,8 @@ func (board Board) MapDomainCreated(event core.DomainEvent) (mappedBoard Board) 
 			Name: col.Name,
 		})
 	}
+	mappedBoard.Created = event.Timestamp
+	mappedBoard.Updated = event.Timestamp
+	mappedBoard.Version = event.Version
 	return
 }
