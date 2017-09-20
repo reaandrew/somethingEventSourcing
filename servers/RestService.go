@@ -17,5 +17,5 @@ func main() {
 	var commandExecutor = commands.NewCommandExecutor(domainRepository)
 
 	var r = rest.SetupRouter(commandExecutor, queryExecutor)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run()
 }
