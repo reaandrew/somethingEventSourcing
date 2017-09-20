@@ -3,8 +3,6 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/reaandrew/forora/commands"
-	"github.com/reaandrew/forora/domain/services"
-	"github.com/reaandrew/forora/infrastructure/inmemory"
 	"github.com/reaandrew/forora/queries"
 	uuid "github.com/satori/go.uuid"
 )
@@ -95,17 +93,4 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 	}
 
 	return r
-}
-
-func main() {
-	var queryStore = map[string]interface{}{}
-	var queryExecutor = inmemory.NewInMemoryQueryExecutor(queryStore)
-
-	var eventStore = inmemory.NewInMemoryEventStore()
-	var eventPublisher = inmemory.NewInMemoryEventPublisher(queryStore)
-	var domainRepository = services.NewDomainRepository(eventStore, eventPublisher)
-	var commandExecutor = commands.NewCommandExecutor(domainRepository)
-
-	var r = SetupRouter(commandExecutor, queryExecutor)
-	r.Run() // listen and serve on 0.0.0.0:8080
 }

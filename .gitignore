@@ -3,3 +3,5 @@ eventsourcing-in-go
 coverage-all.out
 coverage.out
 .terraform
+dist/
+terraform.tfstate.backup
