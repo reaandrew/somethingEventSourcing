@@ -1,4 +1,4 @@
-package mappers_test
+package dtos_test
 
 import (
 	"testing"

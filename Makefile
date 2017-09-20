@@ -28,6 +28,10 @@ terraform_destroy:
 ./dist/forora-api-server: servers/RestService.go
 	(cd servers/ && GOOS=linux go build -o ../dist/forora-api-server .)
 
+.PHONY: deps
+deps:
+	go get -t ./...
+
 .PHONY: test
 test:
 	go test ./...
