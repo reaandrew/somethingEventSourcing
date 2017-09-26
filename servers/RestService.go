@@ -20,5 +20,5 @@ func main() {
 	var r = rest.SetupRouter(commandExecutor, queryExecutor)
 
 	daemon.SdNotify(false, "READY=1")
-	r.Run()
+	r.Run(":9000")
 }

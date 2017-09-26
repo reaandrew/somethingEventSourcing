@@ -1,15 +1,21 @@
 package rest
 
 import (
+	"net/http"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/reaandrew/forora/commands"
 	"github.com/reaandrew/forora/queries"
 	uuid "github.com/satori/go.uuid"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func SetupRouter(commandExecutor commands.CommandExecutor,
 	queryExecutor queries.QueryExecutor) *gin.Engine {
 	r := gin.Default()
+	r.LoadHTMLGlob("./data/templates/*")
 	var v1 = r.Group("/v1")
 	{
 		var boards = v1.Group("/boards")
@@ -90,6 +96,33 @@ func SetupRouter(commandExecutor commands.CommandExecutor,
 					}))
 			})
 		}
+	}
+	// Credentials which stores google ids.
+	type Credentials struct {
+		Cid     string `json:"cid"`
+		Csecret string `json:"csecret"`
+	}
+
+	var c = Credentials{
+		Cid:     os.Getenv("GOOGLE_CID"),
+		Csecret: os.Getenv("GOOGLE_CSECRET"),
+	}
+	conf := &oauth2.Config{
+		ClientID:     c.Cid,
+		ClientSecret: c.Csecret,
+		RedirectURL:  "http://localhost:8000/auth",
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
+		},
+		Endpoint: google.Endpoint,
+	}
+	var auth = r.Group("")
+	{
+		auth.GET("/", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+				"LoginURL": conf.AuthCodeURL(uuid.NewV4().String()),
+			})
+		})
 	}
 
 	return r

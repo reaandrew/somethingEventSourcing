@@ -38,3 +38,4 @@ test:
 
 .PHONY: build
 build: ./dist/forora-api-server
+	cp -r data ./dist
