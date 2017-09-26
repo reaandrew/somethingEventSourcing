@@ -1,0 +1,11 @@
+[Unit]
+Description=forora service
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/forora
+WatchdogSec=30s
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

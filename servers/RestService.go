@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/coreos/go-systemd/daemon"
 	"github.com/reaandrew/forora/api/http/rest"
 	"github.com/reaandrew/forora/commands"
 	"github.com/reaandrew/forora/domain/services"
@@ -17,5 +18,7 @@ func main() {
 	var commandExecutor = commands.NewCommandExecutor(domainRepository)
 
 	var r = rest.SetupRouter(commandExecutor, queryExecutor)
+
+	daemon.SdNotify(false, "READY=1")
 	r.Run()
 }

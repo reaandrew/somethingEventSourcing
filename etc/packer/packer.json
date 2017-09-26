@@ -1,0 +1,46 @@
+{
+  "variables": {
+  },
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "etc/systemd/system/forora.service",
+      "destination": "/home/centos/forora.service"
+    },
+    {
+        "type": "shell",
+        "inline": [
+            "sudo yum -y install wget",
+            "wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64",
+            "chmod +x ./jq",
+            "sudo mv jq /usr/bin",
+			"curl -s https://api.github.com/repos/reaandrew/forora/releases/latest | jq '. | .assets[0] | .browser_download_url' | xargs curl -sOL",
+            "chmod +x forora",
+            "sudo mv forora /usr/bin/",
+            "sudo mv forora.service /etc/systemd/system/forora.service",
+            "sudo sudo systemctl enable forora.service",
+            "sudo sudo systemctl start forora.service",
+            "sudo rm /usr/bin/jq"
+        ]
+    }
+  ],
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "eu-west-1",
+      "source_ami_filter": {
+          "most_recent":true,
+          "owners":["self"],
+          "filters":{
+            "name":"base-centos-7"
+          }
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "centos",
+      "ami_name": "forora",
+      "force_deregister": true,
+      "force_delete_snapshot": true
+    }
+  ],
+  "post-processors": []
+}

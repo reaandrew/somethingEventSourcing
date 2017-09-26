@@ -118,6 +118,16 @@ resource "aws_key_pair" "auth" {
   public_key = "${file(var.public_key_path)}"
 }
 
+data "aws_ami" "forora_ami" {
+  most_recent      = true
+  owners = ["self"]
+
+  filter {
+    name   = "name"
+    values = ["forora"]
+  }
+}
+
 resource "aws_instance" "web" {
 
   tags = "${var.default_tags}"
@@ -135,7 +145,8 @@ resource "aws_instance" "web" {
 
   # Lookup the correct AMI based on the region
   # we specified
-  ami = "${lookup(var.aws_amis, var.aws_region)}"
+  # ami = "${lookup(var.aws_amis, var.aws_region)}"
+  ami = "${data.aws_ami.forora_ami.image_id}"
 
   # The name of our SSH keypair we created above.
   key_name = "${aws_key_pair.auth.id}"
